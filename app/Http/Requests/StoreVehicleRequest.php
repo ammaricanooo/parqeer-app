@@ -11,7 +11,7 @@ class StoreVehicleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->role === 'petugas';
+        return $this->user()->role === 'attendant';
     }
 
     /**

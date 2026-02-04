@@ -33,7 +33,14 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('petugas.transaction.exit.process', $transaction->id) }}" method="POST">
+                    <!-- Current amount realtime -->
+                    <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg" id="current-amount-container">
+                        <h3 class="font-bold mb-2">Jumlah Saat Ini (Realtime)</h3>
+                        <p id="current-amount" class="text-2xl font-bold">Menghitung...</p>
+                        <p class="text-sm text-gray-500 mt-1" id="current-amount-meta"></p>
+                    </div>
+
+                    <form action="{{ route('attendant.transaction.exit.process', $transaction->id) }}" method="POST">
                         @csrf
 
                         <!-- Waktu Keluar -->
@@ -56,11 +63,37 @@
                             <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
                                 Proses Keluar & Hitung Tarif
                             </button>
-                            <a href="{{ route('petugas.transaction.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('attendant.transaction.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Batal
                             </a>
                         </div>
                     </form>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const amountEl = document.getElementById('current-amount');
+                            const metaEl = document.getElementById('current-amount-meta');
+                            const fetchAmount = () => {
+                                fetch('{{ route('attendant.transaction.current-amount', $transaction->id) }}', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            amountEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.amount);
+                                            metaEl.textContent = 'Durasi: ' + data.hours + ' jam (' + data.minutes + ' menit)';
+                                        } else {
+                                            amountEl.textContent = '—';
+                                            metaEl.textContent = '';
+                                        }
+                                    }).catch(()=> {
+                                        amountEl.textContent = '—';
+                                        metaEl.textContent = '';
+                                    });
+                            };
+
+                            fetchAmount();
+                            setInterval(fetchAmount, 30000); // tiap 30 detik
+                        });
+                    </script>
                 </div>
             </div>
         </div>

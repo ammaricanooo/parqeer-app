@@ -9,7 +9,7 @@
     </x-slot>
 
 
-    <section class="py-12">
+    <section class="pt-12 pb-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white relative shadow-md sm:rounded-lg space-y-3 md:space-y-0 md:space-x-4 p-4">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -66,7 +66,7 @@
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                     required>
                                         <option value="admin">Admin</option>
-                                        <option value="petugas">Petugas</option>
+                                        <option value="attendant">Attendant</option>
                                         <option value="owner">Owner</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('role')" class="mt-2" />

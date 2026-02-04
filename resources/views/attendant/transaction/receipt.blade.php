@@ -229,10 +229,10 @@
 
     <div class="no-print">
         <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Struk</button>
-        <a href="{{ route('petugas.transaction.index') }}" class="btn btn-back">← Kembali</a>
+        <a href="{{ route('attendant.transaction.index') }}" class="btn btn-back">← Kembali</a>
 
         @if ($transaction->status !== 'paid')
-            <form action="{{ route('petugas.transaction.pay', $transaction->id) }}" method="POST" style="display: inline;">
+            <form action="{{ route('attendant.transaction.pay', $transaction->id) }}" method="POST" style="display: inline;">
                 @csrf
                 <input type="hidden" name="paid_amount" value="{{ $transaction->amount }}">
                 <button type="submit" class="btn" style="background: #ffc107;">Konfirmasi Pembayaran</button>

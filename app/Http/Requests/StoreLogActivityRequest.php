@@ -11,7 +11,7 @@ class StoreLogActivityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->role === 'petugas' || $this->user()->role === 'admin';
+        return $this->user()->role === 'attendant' || $this->user()->role === 'admin';
     }
 
     /**

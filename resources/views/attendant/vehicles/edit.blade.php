@@ -9,7 +9,7 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('petugas.vehicle.update', $vehicle->id) }}" method="POST">
+                    <form action="{{ route('attendant.vehicle.update', $vehicle->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -52,8 +52,7 @@
                                 <option value="">-- Pilih Tipe --</option>
                                 <option value="motorcycle" {{ old('type', $vehicle->type) == 'motorcycle' ? 'selected' : '' }}>Motor</option>
                                 <option value="car" {{ old('type', $vehicle->type) == 'car' ? 'selected' : '' }}>Mobil</option>
-                                <option value="truck" {{ old('type', $vehicle->type) == 'truck' ? 'selected' : '' }}>Truk</option>
-                                <option value="bus" {{ old('type', $vehicle->type) == 'bus' ? 'selected' : '' }}>Bus</option>
+
                             </select>
                             @error('type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -65,7 +64,7 @@
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Simpan Perubahan
                             </button>
-                            <a href="{{ route('petugas.vehicle.show', $vehicle->id) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('attendant.vehicle.show', $vehicle->id) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Batal
                             </a>
                         </div>

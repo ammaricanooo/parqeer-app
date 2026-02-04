@@ -16,14 +16,14 @@ Route::get('/', function () {
 // Debug route
 Route::get('/debug/test-user', [DebugController::class, 'testUser']);
 
-// Dashboard untuk petugas (default)
+// Dashboard untuk attendant (default)
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// ===== ROUTES UNTUK PETUGAS =====
-Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
-    // Transaction routes - Petugas bisa input kendaraan masuk, lihat daftar, input keluar, cetak struk
+// ===== ROUTES UNTUK attendant =====
+Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->name('attendant.')->group(function () {
+    // Transaction routes - attendant bisa input kendaraan masuk, lihat daftar, input keluar, cetak struk
     Route::get('/transaction', [TransactionController::class, 'index'])->name('transaction.index');
     Route::get('/transaction/create', [TransactionController::class, 'create'])->name('transaction.create');
     Route::post('/transaction', [TransactionController::class, 'store'])->name('transaction.store');
@@ -33,15 +33,20 @@ Route::middleware(['auth', 'verified', 'role:petugas'])->prefix('petugas')->name
     Route::post('/transaction/{transaction}/pay', [TransactionController::class, 'pay'])->name('transaction.pay');
     Route::get('/transaction/search/vehicle', [TransactionController::class, 'searchVehicle'])->name('transaction.search-vehicle');
     Route::get('/transaction/get-rate', [TransactionController::class, 'getRate'])->name('transaction.get-rate');
+    Route::get('/transaction/{transaction}/current-amount', [TransactionController::class, 'currentAmount'])->middleware(['auth','verified'])->name('transaction.current-amount');
 
-    // Vehicle routes - Petugas bisa input kendaraan baru
-    Route::get('/vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
-    Route::get('/vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
-    Route::post('/vehicle', [VehicleController::class, 'store'])->name('vehicle.store');
-    Route::get('/vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
-    Route::get('/vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
-    Route::put('/vehicle/{vehicle}', [VehicleController::class, 'update'])->name('vehicle.update');
-    Route::delete('/vehicle/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicle.destroy');
+    // Struk entry & QR
+    Route::get('/transaction/{transaction}/entry-receipt', [TransactionController::class, 'entryReceipt'])->name('transaction.entry-receipt');
+    Route::get('/transaction/scan', [TransactionController::class, 'scanQr'])->name('transaction.scan');
+
+    // Vehicle routes - attendant bisa input kendaraan baru
+    Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
+    Route::get('/vehicle/create', [VehicleController::class, 'create'])->name('vehicles.create');
+    Route::post('/vehicle', [VehicleController::class, 'store'])->name('vehicles.store');
+    Route::get('/vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
+    Route::get('/vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicles.edit');
+    Route::put('/vehicle/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
+    Route::delete('/vehicle/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 });
 
 // Dashboard admin
@@ -51,6 +56,9 @@ Route::get('/admin/dashboard', function () {
 Route::get('/admin/users', [UserController::class, 'index'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users');
 Route::get('/admin/users/create', [UserController::class, 'create'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.create');
 Route::post('/admin/users', [UserController::class, 'store'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.store');
+Route::get('/admin/users/import', [UserController::class, 'importForm'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.import.form');
+Route::post('/admin/users/import', [UserController::class, 'importProcess'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.import.process');
+Route::get('/admin/users/import/template', [UserController::class, 'importTemplate'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.import.template');
 Route::get('/admin/users/edit/{user:id}', [UserController::class, 'edit'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.edit');
 Route::put('/admin/users/edit/{user:id}', [UserController::class, 'update'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.update');
 Route::delete('/admin/users/{user:id}', [UserController::class, 'destroy'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.destroy');
@@ -72,10 +80,21 @@ Route::put('/admin/areas/edit/{area:id}', [AreaController::class, 'update'])->mi
 Route::delete('/admin/areas/{area:id}', [AreaController::class, 'destroy'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.areas.destroy');
 Route::get('/admin/areas/export/excel', [AreaController::class, 'exportExcel'])->name('admin.areas.export');
 
+Route::get('/admin/vehicles', [VehicleController::class, 'index'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicles.index');
+Route::get('/admin/vehicles/{vehicle}', [VehicleController::class, 'show'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicles.show');
+
+Route::get('/admin/transaction/{transaction}/current-amount', [TransactionController::class, 'currentAmount'])->middleware(['auth','verified','role:admin'])->name('admin.transaction.current-amount');
+
 // Dashboard owner
-Route::get('/owner/dashboard', function () {
-    return view('owner.dashboard');
-})->middleware(['auth', 'verified', 'role:owner'])->name('owner.dashboard');
+Route::middleware(['auth', 'verified', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('owner.dashboard');
+    })->name('dashboard');
+
+    // Owner: hanya menampilkan log aktivitas (list + detail)
+    Route::get('/logs', [\App\Http\Controllers\LogActivityController::class, 'index'])->name('logs.index');
+    Route::get('/logs/{logActivity}', [\App\Http\Controllers\LogActivityController::class, 'show'])->name('logs.show');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

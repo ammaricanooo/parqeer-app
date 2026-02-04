@@ -7,7 +7,7 @@
         </h2>
     </x-slot>
 
-    <section class="py-12">
+    <section class="pt-12 pb-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-md sm:rounded-lg p-4">
 
@@ -44,7 +44,6 @@
                             Tambah Area
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>

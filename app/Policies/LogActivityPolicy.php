@@ -13,7 +13,8 @@ class LogActivityPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        // Owner (dan admin jika diperlukan) dapat melihat log aktivitas
+        return $user->role === 'owner' || $user->role === 'admin';
     }
 
     /**
@@ -21,7 +22,7 @@ class LogActivityPolicy
      */
     public function view(User $user, LogActivity $logActivity): bool
     {
-        return false;
+        return $user->role === 'owner' || $user->role === 'admin';
     }
 
     /**

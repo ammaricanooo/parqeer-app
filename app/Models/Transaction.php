@@ -90,7 +90,7 @@ class Transaction extends Model
         $hours = ceil($duration / 60);
         $amount = $this->rate->amount * $hours;
         $this->amount = $amount;
-        $this->status = 'sudah_keluar';
+        $this->status = 'out';
 
         $this->save();
     }

@@ -51,11 +51,12 @@ class Area extends Model
      */
     public function updateOccupancy(): void
     {
-        $occupied = $this->transactions()
+        $occupied = Transaction::where('area_id', $this->id)
             ->whereNull('exit_time')
             ->count();
-
-        $this->update(['occupied' => $occupied]);
+    
+        $this->occupied = $occupied;
+        $this->save();
     }
 
     /**

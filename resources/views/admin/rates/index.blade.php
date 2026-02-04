@@ -3,7 +3,7 @@
         Data Rates
     </x-slot>
 
-    <section class="py-12">
+    <section class="pt-12 pb-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
 

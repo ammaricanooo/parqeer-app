@@ -23,7 +23,7 @@ return new class extends Migration
             $table->dateTime('exit_time')->nullable();
             $table->integer('duration_minutes')->nullable(); // Durasi parkir dalam menit
             $table->decimal('amount', 10, 2)->nullable(); // Null saat entry, diisi saat exit/payment
-            $table->enum('status', ['parked', 'paid', 'pending_payment'])->default('parked'); // Status pembayaran
+            $table->enum('status', ['in', 'out', 'paid'])->default('in'); // Status pembayaran
             $table->timestamps();
 
             $table->index('vehicle_id');

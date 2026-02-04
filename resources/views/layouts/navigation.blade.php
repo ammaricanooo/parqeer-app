@@ -17,21 +17,26 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                         <x-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
-                            {{ __('Users') }}
+                            {{ __('Pengguna') }}
                         </x-nav-link>
                         <x-nav-link :href="route('admin.rates.index')" :active="request()->routeIs('admin.rates.index')">
-                            {{ __('Rates') }}
+                            {{ __('Tarif Parkir') }}
                         </x-nav-link>
                         <x-nav-link :href="route('admin.areas.index')" :active="request()->routeIs('admin.areas.index')">
-                            {{ __('Areas') }}
+                            {{ __('Area Parkir') }}
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()->role === 'petugas')
-                        <x-nav-link :href="route('petugas.vehicle.index')" :active="request()->routeIs('petugas.vehicle.index')">
+                    @if (Auth::user()->role === 'attendant')
+                        <x-nav-link :href="route('attendant.vehicles.index')" :active="request()->routeIs('attendant.vehicles.index')">
                             {{ __('Vehicles') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('petugas.transaction.index')" :active="request()->routeIs('petugas.transaction.index')">
+                        <x-nav-link :href="route('attendant.transaction.index')" :active="request()->routeIs('attendant.transaction.index')">
                             {{ __('Transactions') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->role === 'owner')
+                        <x-nav-link :href="route('owner.logs.index')" :active="request()->routeIs('owner.logs.index')">
+                            {{ __('Logs Aktivitas') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -89,21 +94,26 @@
             </x-responsive-nav-link>
             @if (Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
-                    {{ __('Users') }}
+                    {{ __('Pengguna') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.rates.index')" :active="request()->routeIs('admin.rates.index')">
-                    {{ __('Rates') }}
+                    {{ __('Tarif Parkir') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.areas.index')" :active="request()->routeIs('admin.areas.index')">
-                    {{ __('Areas') }}
+                    {{ __('Area Parkir') }}
                 </x-responsive-nav-link>
             @endif
-            @if (Auth::user()->role === 'petugas')
-                <x-responsive-nav-link :href="route('petugas.vehicle.index')" :active="request()->routeIs('petugas.vehicle.index')">
+            @if (Auth::user()->role === 'attendant')
+                <x-responsive-nav-link :href="route('attendant.vehicles.index')" :active="request()->routeIs('attendant.vehicles.index')">
                     {{ __('Vehicles') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('petugas.transaction.index')" :active="request()->routeIs('petugas.transaction.index')">
+                <x-responsive-nav-link :href="route('attendant.transaction.index')" :active="request()->routeIs('attendant.transaction.index')">
                     {{ __('Transactions') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->role === 'owner')
+                <x-responsive-nav-link :href="route('owner.logs.index')" :active="request()->routeIs('owner.logs.index')">
+                    {{ __('Logs Aktivitas') }}
                 </x-responsive-nav-link>
             @endif
         </div>

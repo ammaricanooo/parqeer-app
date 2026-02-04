@@ -15,7 +15,7 @@ class VehicleController extends Controller
     public function index(): View
     {
         $vehicles = Vehicle::latest()->paginate(15);
-        return view('attendant.vehicle.index', compact('vehicles'));
+        return view('attendant.vehicles.index', compact('vehicles'));
     }
 
     /**
@@ -23,7 +23,7 @@ class VehicleController extends Controller
      */
     public function create(): View
     {
-        return view('attendant.vehicle.create');
+        return view('attendant.vehicles.create');
     }
 
     /**
@@ -31,15 +31,17 @@ class VehicleController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', Vehicle::class);
+
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20|unique:vehicles,plate_number',
             'color' => 'required|string|max:30',
-            'type' => 'required|string|in:motorcycle,car,truck,bus',
+            'type' => 'required|string|in:motorcycle,car',
         ]);
 
         Vehicle::create($validated);
 
-        return redirect()->route('petugas.vehicle.index')
+        return redirect()->route('attendant.vehicles.index')
             ->with('success', 'Kendaraan berhasil ditambahkan.');
     }
 
@@ -49,7 +51,7 @@ class VehicleController extends Controller
     public function show(Vehicle $vehicle): View
     {
         $vehicle->load(['transactions']);
-        return view('vehicle.show', compact('vehicle'));
+        return view('attendant.vehicles.show', compact('vehicle'));
     }
 
     /**
@@ -57,7 +59,7 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle): View
     {
-        return view('vehicle.edit', compact('vehicle'));
+        return view('attendant.vehicles.edit', compact('vehicle'));
     }
 
     /**
@@ -68,12 +70,12 @@ class VehicleController extends Controller
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20|unique:vehicles,plate_number,' . $vehicle->id,
             'color' => 'required|string|max:30',
-            'type' => 'required|string|in:motorcycle,car,truck,bus',
+            'type' => 'required|string|in:motorcycle,car',
         ]);
 
         $vehicle->update($validated);
 
-        return redirect()->route('petugas.vehicle.index')
+        return redirect()->route('attendant.vehicles.index')
             ->with('success', 'Kendaraan berhasil diperbarui.');
     }
 
@@ -83,7 +85,7 @@ class VehicleController extends Controller
     public function destroy(Vehicle $vehicle): RedirectResponse
     {
         $vehicle->delete();
-        return redirect()->route('petugas.vehicle.index')
+        return redirect()->route('attendant.vehicles.index')
             ->with('success', 'Kendaraan berhasil dihapus.');
     }
 }

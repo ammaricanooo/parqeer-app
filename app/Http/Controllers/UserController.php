@@ -44,7 +44,7 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string',
-            'role' => 'required|in:admin,petugas,owner',
+            'role' => 'required|in:admin,attendant,owner',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -52,17 +52,15 @@ class UserController extends Controller
             $file = $request->file('photo');
             $filename = time() . '-' . Str::slug($request->username) . '.' . $file->getClientOriginalExtension();
             $file->storeAs('users', $filename, 'public');
-
-            // Simpan data produk ke database
+            }
             User::create([
-                'photo' => $filename,
+                'photo' => $filename ?? null,
                 'name' => $request->name,
                 'username' => $request->username,
                 'password' => bcrypt($request->password),
                 'role' => $request->role,
                 'status' => $request->status
             ]);
-        }
         return redirect('/admin/users')->with('success', 'Data user berhasil ditambahkan!');
     }
 
@@ -94,7 +92,7 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:users,username,' . $user->id,
             'password' => 'nullable|string|min:6',
-            'role' => 'required|in:admin,petugas,owner',
+            'role' => 'required|in:admin,attendant,owner',
             'status' => 'required|in:active,inactive',
         ];
 
@@ -137,5 +135,38 @@ class UserController extends Controller
     public function exportExcel()
     {
         return Excel::download(new UsersExport, "data_user_parqeer.xlsx");
+    }
+
+    /**
+     * Show import form
+     */
+    public function importForm()
+    {
+        return view('admin.users.import');
+    }
+
+    /**
+     * Download template sesuai layout export
+     */
+    public function importTemplate()
+    {
+        return Excel::download(new \App\Exports\UsersTemplateExport, 'template_users_parqeer.xlsx');
+    }
+
+    /**
+     * Process import file
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new \App\Imports\UsersImport, $request->file('file'));
+            return redirect()->route('admin.users')->with('success', 'Import selesai. Password default untuk user baru: admin1234#');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Import gagal: ' . $e->getMessage());
+        }
     }
 }

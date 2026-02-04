@@ -13,7 +13,7 @@ class VehiclePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant' || $user->role === 'admin';
     }
 
     /**
@@ -21,7 +21,7 @@ class VehiclePolicy
      */
     public function view(User $user, Vehicle $vehicle): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant' || $user->role === 'admin';
     }
 
     /**
@@ -29,7 +29,7 @@ class VehiclePolicy
      */
     public function create(User $user): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant';
     }
 
     /**
@@ -37,7 +37,7 @@ class VehiclePolicy
      */
     public function update(User $user, Vehicle $vehicle): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant';
     }
 
     /**
@@ -45,7 +45,7 @@ class VehiclePolicy
      */
     public function delete(User $user, Vehicle $vehicle): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant';
     }
 
     /**
@@ -53,7 +53,7 @@ class VehiclePolicy
      */
     public function restore(User $user, Vehicle $vehicle): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant';
     }
 
     /**
@@ -61,6 +61,6 @@ class VehiclePolicy
      */
     public function forceDelete(User $user, Vehicle $vehicle): bool
     {
-        return $user->role === 'petugas' || $user->role === 'admin';
+        return $user->role === 'attendant';
     }
 }

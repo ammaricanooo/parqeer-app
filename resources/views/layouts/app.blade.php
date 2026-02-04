@@ -16,7 +16,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 pb-4">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -28,9 +28,38 @@
                 </header>
             @endisset
 
+            @if (session()->has('success'))
+            <script>
+                Swal.fire({
+                    type: "success",
+                    icon: "success",
+                    title: "BERHASIL!",
+                    text: "{{ session('success') }}",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    buttons: false,
+                });
+            </script>
+        @elseif (session()->has('error'))
+            <script>
+                Swal.fire({
+                    type: "error",
+                    icon: "error",
+                    title: "GAGAL!",
+                    text: "{{ session('error') }}",
+                    timer: 1500,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    buttons: false,
+                });
+            </script>
+        @endif
+
             <!-- Page Content -->
             <main>
                 {{ $slot }}
+                <p class="text-center">Ammar Abdul Malik - XII RPL</p>
             </main>
         </div>
     </body>
