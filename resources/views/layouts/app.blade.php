@@ -59,7 +59,7 @@
             <!-- Page Content -->
             <main>
                 {{ $slot }}
-                <p class="text-center">Ammar Abdul Malik - XII RPL</p>
+                <p class="text-center">2026 Ammar Abdul Malik - XII RPL SMK BINA INFORATIKA</p>
             </main>
         </div>
     </body>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="title">
-        Data User Parqeer
+        Data Pengguna Parqeer
     </x-slot>
 
     <!-- Start block -->
@@ -11,7 +11,7 @@
                     class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                     <div class="flex-1 flex items-center space-x-2">
                         <h5>
-                            <span class="text-gray-800 font-semibold">Data User Parqeer</span>
+                            <span class="text-gray-800 font-semibold">Data Pengguna Parqeer</span>
                         </h5>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                                             d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
                                     </svg>
                                 </div>
-                                <input type="text" name="search" placeholder="Cari data user" value="{{ request('search') }}"
+                                <input type="text" name="search" placeholder="Cari data pengguna" value="{{ request('search') }}"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-0 focus:border-primary block w-full pl-10 p-2">
                                 </div>
                                 <button type="submit"
@@ -39,15 +39,10 @@
                     </div>
                     <div
                         class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                        <a href="{{ route('admin.users.import.form') }}"
-                            class="flex items-center justify-center text-white bg-[#107c41] hover:bg-[#107c41]/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="4"><path stroke-linejoin="round" d="M8 15V6a2 2 0 0 1 2-2h28a2 2 0 0 1 2 2v36a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-9"/><path d="M31 15h3m-6 8h6m-6 8h6"/><path stroke-linejoin="round" d="M4 15h18v18H4zm6 6l6 6m0-6l-6 6"/></g></svg>
-                            Import Data user (Excel)
-                        </a>
                         <a href="{{ route('admin.users.export') }}"
                             class="flex items-center justify-center text-white bg-[#107c41] hover:bg-[#107c41]/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="4"><path stroke-linejoin="round" d="M8 15V6a2 2 0 0 1 2-2h28a2 2 0 0 1 2 2v36a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-9"/><path d="M31 15h3m-6 8h6m-6 8h6"/><path stroke-linejoin="round" d="M4 15h18v18H4zm6 6l6 6m0-6l-6 6"/></g></svg>
-                            Export Data user (Excel)
+                            Export Data Pengguna (Excel)
                         </a>
                         <a href="{{ route('admin.users.create') }}"
                             class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
@@ -56,7 +51,7 @@
                                 <path clip-rule="evenodd" fill-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                             </svg>
-                            Tambah Data user
+                            Tambah Data Pengguna
                         </a>
                     </div>
                 </div>
@@ -65,8 +60,8 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" class="p-4">Foto</th>
-                                <th scope="col" class="p-4">Nama</th>
-                                <th scope="col" class="p-4">Username</th>
+                                <th scope="col" class="p-4">Nama Lengkap</th>
+                                <th scope="col" class="p-4">Nama Pengguna</th>
                                 <th scope="col" class="p-4">Role</th>
                                 <th scope="col" class="p-4">Status</th>
                             </tr>
@@ -100,7 +95,7 @@
                                     </td>
                                     <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                                         <div class="flex items-centers max-w-sm lg:max-w-2xl">
-                                            <p class="text-ellipsis overflow-hidden">{{ $user->status }}</p>
+                                            <p class="text-ellipsis overflow-hidden">{{ $user->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}</p>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">

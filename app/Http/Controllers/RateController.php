@@ -17,11 +17,29 @@ class RateController extends Controller
     {
         $query = Rate::with('area');
 
-        if (request('search')) {
-            $query->where('vehicle_type', 'like', '%' . request('search') . '%')
-                ->orWhereHas('area', function ($q) {
-                    $q->where('name', 'like', '%' . request('search') . '%');
+        if ($search = request('search')) {
+
+            $vehicleMap = [
+                'mobil' => 'car',
+                'motor' => 'motorcycle',
+                'car' => 'car',
+                'motorcycle' => 'motorcycle',
+            ];
+
+            $query->where(function ($q) use ($search, $vehicleMap) {
+
+                // search vehicle_type
+                if (isset($vehicleMap[strtolower($search)])) {
+                    $q->where('vehicle_type', $vehicleMap[strtolower($search)]);
+                } else {
+                    $q->where('vehicle_type', 'like', "%{$search}%");
+                }
+
+                // search area name
+                $q->orWhereHas('area', function ($area) use ($search) {
+                    $area->where('name', 'like', "%{$search}%");
                 });
+            });
         }
 
         $rates = $query->paginate(10);
@@ -34,7 +52,9 @@ class RateController extends Controller
      */
     public function create()
     {
-        $areas = Area::all();
+        $areas = Area::whereNotIn('id', function ($query) {
+            $query->select('area_id')->from('rates');
+        })->get();
         return view('admin.rates.create', compact('areas'));
     }
 
@@ -43,9 +63,8 @@ class RateController extends Controller
      */
     public function store(StoreRateRequest $request)
     {
-        // dd($request->all());
         $request->validate([
-            'area_id' => 'required|exists:areas,id',
+            'area_id' => 'required|exists:areas,id|unique:rates,area_id',
             'vehicle_type' => 'required|string|max:50',
             'amount' => 'required|integer|min:0',
         ]);
@@ -74,21 +93,10 @@ class RateController extends Controller
      */
     public function edit(Rate $rate, Request $request)
     {
-        $request->validate([
-            'area_id' => 'required|exists:areas,id',
-            'vehicle_type' => 'required|string|max:50',
-            'amount' => 'required|integer|min:0',
-        ]);
-
-        $rate->update([
-            'area_id'      => $request->area_id,
-            'vehicle_type' => $request->vehicle_type,
-            'amount'       => $request->amount,
-        ]);
-
-        return redirect()
-            ->route('admin.rates.index')
-            ->with('success', 'Data rate berhasil diperbarui!');
+        $areas = Area::whereNotIn('id', function ($query) use ($rate) {
+            $query->select('area_id')->from('rates')->where('id', '!=', $rate->id);
+        })->get();
+        return view('admin.rates.edit', compact('rate', 'areas'));
     }
 
     /**
@@ -99,7 +107,7 @@ class RateController extends Controller
         $request->validate([
             'area_id' => 'required|exists:areas,id',
             'vehicle_type' => 'required|string|max:50',
-            'amount' => 'required|integer|min:0',
+            'amount' => 'required|numeric|min:0',
         ]);
 
         $rate->update([

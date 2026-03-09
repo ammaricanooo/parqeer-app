@@ -14,8 +14,14 @@ class VehicleController extends Controller
      */
     public function index(): View
     {
-        $vehicles = Vehicle::latest()->paginate(15);
-        return view('attendant.vehicles.index', compact('vehicles'));
+        $query = Vehicle::query();
+        if (request('search')) {
+            $query->where('plate_number', 'like', '%' . request('search') . '%')
+                ->orWhere('color', 'like', '%' . request('search') . '%');
+        }
+        $vehicles = $query->paginate(10);
+
+        return view('admin.vehicles.index', compact('vehicles'));
     }
 
     /**
@@ -88,5 +94,42 @@ class VehicleController extends Controller
         return redirect()->route('attendant.vehicles.index')
             ->with('success', 'Kendaraan berhasil dihapus.');
     }
-}
 
+    /**
+     * Admin: list vehicles
+     */
+    public function adminIndex(): View
+    {
+        $this->authorize('viewAny', Vehicle::class);
+        $vehicles = Vehicle::with(['transactions'])->latest()->paginate(15);
+        return view('admin.vehicles.index', compact('vehicles'));
+    }
+
+    /**
+     * Admin: show vehicle detail with transactions/receipts
+     */
+    public function adminShow(Vehicle $vehicle): View
+    {
+        $this->authorize('view', $vehicle);
+        $vehicle->load(['transactions' => fn($q) => $q->orderBy('created_at', 'desc')->with(['area', 'rate'])]);
+        return view('admin.vehicles.show', compact('vehicle'));
+    }
+
+    /**
+     * Owner: list vehicles
+     */
+    public function ownerIndex(): View
+    {
+        $vehicles = Vehicle::with(['transactions'])->latest()->paginate(15);
+        return view('owner.vehicles.index', compact('vehicles'));
+    }
+
+    /**
+     * Owner: show vehicle detail with transactions/receipts
+     */
+    public function ownerShow(Vehicle $vehicle): View
+    {
+        $vehicle->load(['transactions' => fn($q) => $q->orderBy('created_at', 'desc')->with(['area', 'rate'])]);
+        return view('owner.vehicles.show', compact('vehicle'));
+    }
+}

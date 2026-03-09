@@ -3,240 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STRUK PARKIR - #{{ $transaction->id }}</title>
+    <title>STRUK KELUAR - #{{ $transaction->id }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            background: #f3f4f6; 
+            padding: 20px; 
+            color: #333;
         }
-        body {
-            font-family: 'Courier New', monospace;
-            background: #f5f5f5;
-            padding: 20px;
+
+        .receipt-container { 
+            width: 100%; 
+            max-width: 320px; 
+            background: white; 
+            margin: 0 auto; 
+            padding: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .receipt-container {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        /* Header */
+        .receipt-header { text-align: center; margin-bottom: 15px; }
+        .receipt-header h1 { 
+            font-family: Arial, sans-serif; 
+            font-size: 24px; 
+            font-weight: 900; 
+            letter-spacing: -1px;
+            color: #2563eb;
         }
-        .receipt-header {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .receipt-header h1 {
-            font-size: 20px;
-            margin: 5px 0;
+        .receipt-header p { font-size: 10px; text-transform: uppercase; color: #666; }
+
+        .plate-number { 
+            font-size: 22px; 
+            font-weight: bold; 
+            text-align: center; 
+            padding: 10px; 
+            background: #f8fafc; 
+            border: 2px dashed #333; 
+            margin: 15px 0; 
             letter-spacing: 2px;
+            font-style: italic;
         }
-        .receipt-header p {
-            font-size: 11px;
-            margin: 2px 0;
+
+        /* Body Details */
+        .receipt-body { margin-bottom: 15px; }
+        .receipt-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 6px 0; 
+            font-size: 12px; 
         }
-        .receipt-body {
-            margin: 15px 0;
+        .label { color: #64748b; }
+        .value { font-weight: bold; text-align: right; }
+
+        .divider { border-top: 1px dashed #cbd5e1; margin: 10px 0; }
+
+        /* Total Section */
+        .total-section {
+            margin-top: 15px;
+            padding: 10px 0;
+            border-top: 2px solid #333;
         }
-        .receipt-row {
+        .total-row {
             display: flex;
             justify-content: space-between;
-            margin: 8px 0;
-            font-size: 13px;
+            align-items: center;
         }
-        .receipt-row-full {
-            width: 100%;
-            margin: 8px 0;
-            font-size: 13px;
-        }
-        .label {
-            font-weight: bold;
-            width: 40%;
-        }
-        .value {
-            text-align: right;
-            width: 60%;
-        }
-        .divider {
-            border-top: 1px dashed #000;
-            margin: 10px 0;
-        }
-        .divider-solid {
-            border-top: 2px solid #000;
-            margin: 10px 0;
-        }
-        .amount-section {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .footer {
+        .total-label { font-size: 13px; font-weight: bold; }
+        .total-amount { font-size: 18px; font-weight: 900; font-family: Arial, sans-serif; }
+
+        /* Status Badges */
+        .status-badge {
             text-align: center;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 2px solid #000;
-            font-size: 11px;
-        }
-        .plate-number {
-            font-size: 18px;
+            padding: 8px;
+            margin: 15px 0;
             font-weight: bold;
-            text-align: center;
-            padding: 10px;
-            background: #f0f0f0;
-            border: 2px solid #000;
-            margin: 10px 0;
-            letter-spacing: 3px;
+            font-size: 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
-        .status-paid {
-            text-align: center;
-            background: #90EE90;
-            color: #000;
-            padding: 10px;
-            margin: 10px 0;
-            font-weight: bold;
-            border-radius: 3px;
+        .status-paid { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .status-pending { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+
+        /* Footer */
+        .footer { 
+            text-align: center; 
+            font-size: 10px; 
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            color: #94a3b8;
         }
-        .status-pending {
-            text-align: center;
-            background: #FFD700;
-            color: #000;
-            padding: 10px;
-            margin: 10px 0;
-            font-weight: bold;
-            border-radius: 3px;
-        }
+
+        /* Print Settings */
         @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .receipt-container {
-                box-shadow: none;
-                border: none;
-                max-width: 100%;
-                width: 58mm;
-                margin: 0;
-                padding: 10px;
-            }
-            .no-print {
-                display: none;
-            }
+            @page { size: 58mm auto; margin: 0; }
+            body { background: white; padding: 0; margin: 0; }
+            .receipt-container { width: 58mm; max-width: 58mm; padding: 8px; border: none; box-shadow: none; }
+            .no-print { display: none !important; }
         }
-        .no-print {
-            text-align: center;
-            margin-top: 20px;
+
+        /* Controls */
+        .no-print { text-align: center; margin-top: 20px; max-width: 400px; margin-inline: auto; }
+        .btn { 
+            display: inline-block; padding: 10px 20px; border-radius: 6px; 
+            font-weight: bold; cursor: pointer; font-family: sans-serif; font-size: 13px;
+            border: none; transition: 0.2s;
         }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 5px;
-            background: #007BFF;
-            color: white;
-            text-decoration: none;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: Arial, sans-serif;
+        .btn-print { background: #059669; color: white; margin-bottom: 10px; }
+        .btn-back { background: #64748b; color: white; text-decoration: none; }
+        
+        /* Payment Card */
+        .payment-card {
+            background: white; padding: 20px; border-radius: 8px; margin-top: 20px;
+            border: 1px solid #e2e8f0; text-align: left;
         }
-        .btn-print {
-            background: #28a745;
-        }
-        .btn-back {
-            background: #6c757d;
-        }
-        .btn:hover {
-            opacity: 0.8;
-        }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #475569; }
+        .input-field { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: bold; }
     </style>
 </head>
+
 <body>
     <div class="receipt-container">
-        <!-- Header -->
         <div class="receipt-header">
-            <h1>🅿️ PARKIR</h1>
-            <p>APLIKASI SISTEM PARKIR</p>
-            <p>No. Struk: #{{ $transaction->id }}</p>
+            <h1>PARQEER</h1>
+            <p>Bukti Pembayaran Parkir</p>
+            <p>ID: #{{ $transaction->id }}</p>
         </div>
 
-        <!-- Plat Nomor -->
         <div class="plate-number">{{ $transaction->plate_number }}</div>
 
-        <!-- Detail Transaksi -->
         <div class="receipt-body">
-            <div class="receipt-row">
-                <span class="label">Warna:</span>
-                <span class="value">{{ $transaction->vehicle_color }}</span>
-            </div>
             <div class="receipt-row">
                 <span class="label">Area:</span>
                 <span class="value">{{ $transaction->area->name }}</span>
             </div>
-            <div class="divider"></div>
-            
             <div class="receipt-row">
                 <span class="label">Masuk:</span>
-                <span class="value">{{ $transaction->entry_time->format('d/m/Y H:i') }}</span>
+                <span class="value">{{ $transaction->entry_time->format('d/m/y H:i') }}</span>
             </div>
             <div class="receipt-row">
                 <span class="label">Keluar:</span>
-                <span class="value">{{ $transaction->exit_time->format('d/m/Y H:i') }}</span>
+                <span class="value">{{ $transaction->exit_time->format('d/m/y H:i') }}</span>
             </div>
+            
             <div class="divider"></div>
 
             <div class="receipt-row">
                 <span class="label">Durasi:</span>
-                <span class="value">{{ $transaction->duration_minutes }} menit</span>
+                <span class="value">{{ $transaction->duration_minutes }} Menit</span>
             </div>
+
             @php
                 $durationHours = ceil($transaction->duration_minutes / 60);
                 $ratePerHour = $transaction->rate->amount;
             @endphp
-            <div class="receipt-row">
-                <span class="label">Jam:</span>
-                <span class="value">{{ $durationHours }} jam</span>
-            </div>
-            <div class="receipt-row">
-                <span class="label">Tarif/Jam:</span>
-                <span class="value">Rp {{ number_format($ratePerHour, 0, ',', '.') }}</span>
-            </div>
-            
-            <div class="divider-solid"></div>
 
-            <div class="receipt-row amount-section">
-                <span class="label">TOTAL ({{ $durationHours }}j x Rp {{ number_format($ratePerHour, 0, ',', '.') }}):</span>
-                <span class="value">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+            <div class="receipt-row">
+                <span class="label">Tarif ({{ $durationHours }} jam):</span>
+                <span class="value">@Rp {{ number_format($ratePerHour, 0, ',', '.') }}</span>
             </div>
 
-            <div class="divider-solid"></div>
+            <div class="total-section">
+                <div class="total-row">
+                    <span class="total-label">TOTAL</span>
+                    <span class="total-amount">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                </div>
+            </div>
 
             @if ($transaction->status === 'paid')
-                <div class="status-paid">✓ SUDAH DIBAYAR</div>
+                <div class="receipt-row" style="margin-top: 10px;">
+                    <span class="label">Bayar:</span>
+                    <span class="value">Rp {{ number_format($transaction->paid_amount, 0, ',', '.') }}</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="label">Kembali:</span>
+                    <span class="value">Rp {{ number_format($transaction->change, 0, ',', '.') }}</span>
+                </div>
+                <div class="status-badge status-paid">✓ Lunas</div>
             @else
-                <div class="status-pending">⚠ BELUM DIBAYAR</div>
+                <div class="status-badge status-pending">⚠ Menunggu Pembayaran</div>
             @endif
         </div>
 
-        <!-- Footer -->
         <div class="footer">
-            <p>Terima kasih telah menggunakan layanan kami</p>
-            <p style="margin-top: 5px;">{{ now()->format('d/m/Y H:i:s') }}</p>
-            <p style="margin-top: 5px; font-size: 10px;">Operator: {{ auth()->user()->name }}</p>
+            <p>Terima kasih atas kunjungan Anda</p>
+            <p style="margin-top: 4px;">{{ now()->format('d/m/Y H:i:s') }}</p>
+            <p style="margin-top: 2px;">OP: {{ auth()->user()->name }}</p>
         </div>
     </div>
 
     <div class="no-print">
-        <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Struk</button>
-        <a href="{{ route('attendant.transaction.index') }}" class="btn btn-back">← Kembali</a>
+        <button onclick="window.print()" class="btn btn-print" style="width: 100%;">🖨️ Cetak Struk (58mm)</button>
+        <a href="{{ route('attendant.transaction.index') }}" class="btn btn-back" style="width: 100%;">← Kembali ke Daftar</a>
 
         @if ($transaction->status !== 'paid')
-            <form action="{{ route('attendant.transaction.pay', $transaction->id) }}" method="POST" style="display: inline;">
-                @csrf
-                <input type="hidden" name="paid_amount" value="{{ $transaction->amount }}">
-                <button type="submit" class="btn" style="background: #ffc107;">Konfirmasi Pembayaran</button>
-            </form>
+            <div class="payment-card shadow-lg">
+                <h4 style="font-weight: 900; font-size: 14px; margin-bottom: 15px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">PROSES PEMBAYARAN</h4>
+                <form action="{{ route('attendant.transaction.pay', $transaction->id) }}" method="POST">
+                    @csrf
+                    <div class="input-group">
+                        <label>JUMLAH UANG DITERIMA (RP)</label>
+                        <input type="number" id="paidAmount" name="paid_amount" required class="input-field" placeholder="0" autofocus />
+                    </div>
+                    
+                    <div id="changeInfo" style="margin-bottom: 15px; min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px;"></div>
+                    
+                    <button type="submit" id="payBtn" class="btn" style="background: #2563eb; color: white; width: 100%; height: 50px; font-size: 16px;" disabled>KONFIRMASI BAYAR</button>
+                </form>
+            </div>
+
+            <script>
+                const totalAmount = {{ $transaction->amount }};
+                const paidInput = document.getElementById('paidAmount');
+                const changeInfo = document.getElementById('changeInfo');
+                const payBtn = document.getElementById('payBtn');
+
+                paidInput.addEventListener('input', function() {
+                    const paid = parseInt(this.value) || 0;
+                    const change = paid - totalAmount;
+
+                    if (paid >= totalAmount) {
+                        changeInfo.style.background = '#dcfce7';
+                        changeInfo.innerHTML = '<b style="color: #166534">Kembali: Rp ' + change.toLocaleString('id-ID') + '</b>';
+                        payBtn.disabled = false;
+                        payBtn.style.opacity = '1';
+                    } else {
+                        changeInfo.style.background = paid > 0 ? '#fee2e2' : 'transparent';
+                        changeInfo.innerHTML = paid > 0 ? '<b style="color: #991b1b">Kurang: Rp ' + (totalAmount - paid).toLocaleString('id-ID') + '</b>' : '';
+                        payBtn.disabled = true;
+                        payBtn.style.opacity = '0.5';
+                    }
+                });
+            </script>
         @endif
     </div>
 </body>

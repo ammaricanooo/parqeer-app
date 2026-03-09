@@ -1,0 +1,199 @@
+{
+  "info": {
+    "name": "Parqeer Mobile API",
+    "description": "API endpoints for Parqeer Flutter mobile app (Android)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"petugas@parqeer.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login attendant and get authentication token\n\nResponse:\n- token: Use in Authorization header for other requests\n- expires_at: Token expiration date"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"Budi Susanto\",\n    \"email\": \"petugas@parqeer.com\",\n    \"role\": \"attendant\"\n  },\n  \"token\": \"7|H3x9wzL8k2mJ4vL5nP2q9R8tU1x4yZ7c9A0bD3eF6\",\n  \"expires_at\": \"2026-03-17T10:30:00Z\"\n}"
+            },
+            {
+              "name": "Invalid Credentials",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid email or password\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout attendant and revoke token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Batch Sync (Offline Transactions)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"type\": \"entry\",\n      \"plate_number\": \"B 1234 ABC\",\n      \"vehicle_color\": \"Merah\",\n      \"area_id\": 1,\n      \"entry_time\": \"2026-02-16 10:30:00\"\n    },\n    {\n      \"type\": \"exit\",\n      \"id\": 123,\n      \"exit_time\": \"2026-02-16 11:45:00\"\n    },\n    {\n      \"type\": \"payment\",\n      \"id\": 123,\n      \"paid_amount\": 50000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/transactions/batch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transactions", "batch"]
+            },
+            "description": "Sync multiple offline transactions (entry, exit, payment)\n\nUseful for:\n- Syncing offline mode queue when back online\n- Batch operations in one request\n- Reducing network calls"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"synced\": 3,\n  \"failed\": 0,\n  \"errors\": [],\n  \"transactions\": [\n    {\n      \"type\": \"entry\",\n      \"transaction_id\": 123,\n      \"status\": \"success\"\n    },\n    {\n      \"type\": \"exit\",\n      \"transaction_id\": 123,\n      \"status\": \"success\"\n    },\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": 123,\n      \"status\": \"success\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Active Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/attendant/active-transactions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "attendant", "active-transactions"]
+            },
+            "description": "Get all active transactions (vehicles still parked) for current attendant\n\nUsed for:\n- Display on mobile dashboard\n- Select vehicle to exit/pay\n- Show duration and estimated cost"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"count\": 5,\n  \"transactions\": [\n    {\n      \"id\": 123,\n      \"plate_number\": \"B 1234 ABC\",\n      \"vehicle_color\": \"Merah\",\n      \"area\": \"Basement 1\",\n      \"entry_time\": \"2026-02-16T10:30:00Z\",\n      \"duration_minutes\": 45,\n      \"duration_hours\": 1,\n      \"estimated_cost\": 15000\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Occupancy & Dashboard",
+      "item": [
+        {
+          "name": "Get Area Occupancy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/areas/occupancy",
+              "host": ["{{base_url}}"],
+              "path": ["api", "areas", "occupancy"]
+            },
+            "description": "Get real-time occupancy for all parking areas\n\nShows:\n- Current occupied slots\n- Available slots\n- Occupancy percentage\n- Status: available / crowded / full\n- Rates per vehicle type"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"areas\": [\n    {\n      \"id\": 1,\n      \"name\": \"Basement 1\",\n      \"capacity\": 150,\n      \"occupied\": 87,\n      \"available\": 63,\n      \"percentage\": 58,\n      \"status\": \"available\",\n      \"rates\": [\n        {\n          \"vehicle_type\": \"car\",\n          \"amount\": 15000\n        }\n      ]\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Basement 2\",\n      \"capacity\": 100,\n      \"occupied\": 95,\n      \"available\": 5,\n      \"percentage\": 95,\n      \"status\": \"full\",\n      \"rates\": [\n        {\n          \"vehicle_type\": \"car\",\n          \"amount\": 15000\n        }\n      ]\n    }\n  ],\n  \"timestamp\": \"2026-02-16T10:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Daily Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/attendant/daily-summary?date=2026-02-16",
+              "host": ["{{base_url}}"],
+              "path": ["api", "attendant", "daily-summary"],
+              "query": [\n                {\n                  \"key\": \"date\",\n                  \"value\": \"2026-02-16\"\n                }\n              ]\n            },
+            "description": "Get attendant's daily summary (transactions, revenue, etc)\n\nParameters:\n- date: YYYY-MM-DD (optional, defaults to today)\n\nReturns:\n- Transaction count\n- Revenue\n- Vehicles entered/exited/paid\n- Average parking duration\n- Average payment per vehicle"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"date\": \"2026-02-16\",\n  \"transactions_count\": 45,\n  \"revenue\": 450000,\n  \"vehicles_entered\": 25,\n  \"vehicles_exited\": 20,\n  \"vehicles_paid\": 18,\n  \"average_duration\": 125,\n  \"average_payment\": 9500\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Device Management",
+      "item": [
+        {
+          "name": "Register Device (For Push Notifications)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            "body": {\n              "mode": "raw",\n              "raw": "{\n  \"device_token\": \"cYX2cX...(Firebase token here)\",\n  \"platform\": \"android\",\n  \"app_version\": \"1.0.0\"\n}"\n            },\n            "url": {\n              "raw": "{{base_url}}/api/mobile/register",\n              "host": ["{{base_url}}"],\n              "path": ["api", "mobile", "register"]\n            },\n            "description": "Register device token for push notifications\n\nUsed for:\n- Receiving admin alerts (occupancy warnings, etc)\n- Server can send notifications to specific attendants\n- Firebase Cloud Messaging (FCM) integration"\n          }\n        },\n        {\n          "name": "Get User Profile",\n          "request": {\n            "method": "GET",\n            "header": [\n              {\n                "key": "Authorization",\n                "value": "Bearer {{token}}"\n              }\n            ],\n            "url": {\n              "raw": "{{base_url}}/api/user",\n              "host": ["{{base_url}}"],\n              "path": ["api", "user"]\n            },\n            "description": "Get current authenticated user profile"\n          },\n          "response": [\n            {\n              "name": "Success",\n              "status": "OK",\n              "code": 200,\n              "body": "{\n  \"id\": 1,\n  \"name\": \"Budi Susanto\",\n  \"email\": \"petugas@parqeer.com\",\n  \"role\": \"attendant\",\n  \"created_at\": \"2026-01-01T00:00:00Z\",\n  \"updated_at\": \"2026-02-16T10:30:00Z\"\n}"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  "variable": [\n    {\n      "key": "base_url",\n      "value": "http://localhost:8000",\n      "type": "string"\n    },\n    {\n      "key": "token",\n      "value": "",\n      "type": "string"\n    }\n  ]\n}

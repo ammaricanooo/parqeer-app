@@ -33,7 +33,7 @@ class LogActivityController extends Controller
 
         $logs = $query->paginate(25)->withQueryString();
 
-        return view('owner.logs.index', compact('logs'));
+        return view('admin.logs.index', compact('logs'));
     }
 
     /**
@@ -45,7 +45,7 @@ class LogActivityController extends Controller
 
         $logActivity->load(['vehicle', 'user', 'transaction']);
 
-        return view('owner.logs.show', compact('logActivity'));
+        return view('admin.logs.show', compact('logActivity'));
     }
 
     // other methods remain intentionally empty to keep read-only for owner

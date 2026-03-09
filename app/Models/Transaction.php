@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,12 +25,16 @@ class Transaction extends Model
         'duration_minutes',
         'amount',
         'status',
+        'paid_amount',
+        'change',
     ];
 
     protected $casts = [
         'entry_time' => 'datetime',
         'exit_time' => 'datetime',
         'amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'change' => 'decimal:2',
         'duration_minutes' => 'integer',
         'status' => 'string',
     ];
@@ -77,7 +82,7 @@ class Transaction extends Model
     /**
      * Hitung durasi dan amount per jam saat vehicle keluar
      */
-    public function processExit(string $exitTime): void
+    public function processExit(Carbon $exitTime): void
     {
         $this->exit_time = $exitTime;
         
@@ -88,7 +93,7 @@ class Transaction extends Model
         // Hitung amount berdasarkan rate (per jam)
         // Jika kurang dari 1 jam, tetap dihitung 1 jam
         $hours = ceil($duration / 60);
-        $amount = $this->rate->amount * $hours;
+        $amount = ($this->rate->amount ?? 0) * $hours;
         $this->amount = $amount;
         $this->status = 'out';
 
@@ -105,11 +110,11 @@ class Transaction extends Model
     }
 
     /**
-     * Scope: Get transaksi yang masih parkir
+     * Scope: Get transaksi yang masih parkir (belum pulang)
      */
-    public function scopeParked($query)
+    public function scopeActive($query)
     {
-        return $query->where('status', 'masuk');
+        return $query->whereNull('exit_time');
     }
 
     /**
@@ -117,6 +122,38 @@ class Transaction extends Model
      */
     public function scopeExited($query)
     {
-        return $query->where('status', 'sudah_keluar');
+        return $query->whereNotNull('exit_time');
+    }
+
+    /**
+     * Scope: Get transaksi yang belum dibayar
+     */
+    public function scopeUnpaid($query)
+    {
+        return $query->where('status', '!=', 'paid');
+    }
+
+    /**
+     * Scope: Get transaksi yang sudah dibayar
+     */
+    public function scopePaid($query)
+    {
+        return $query->where('status', 'paid');
+    }
+
+    /**
+     * Check if parking is currently active (still parked)
+     */
+    public function isActive(): bool
+    {
+        return $this->exit_time === null;
+    }
+
+    /**
+     * Check if payment is completed
+     */
+    public function isPaid(): bool
+    {
+        return $this->status === 'paid';
     }
 }

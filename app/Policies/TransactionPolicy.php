@@ -13,7 +13,7 @@ class TransactionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'attendant' || $user->role === 'admin';
+        return $user->role === 'attendant' || $user->role === 'admin' || $user->role === 'owner';
     }
 
     /**
@@ -21,7 +21,7 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction): bool
     {
-        return $user->role === 'attendant' || $user->role === 'admin';
+        return $user->role === 'attendant' || $user->role === 'admin' || $user->role === 'owner';
     }
 
     /**

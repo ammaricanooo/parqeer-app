@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="title">
-        User
+        Tambah Data Pengguna Parkir
     </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Data User') }}
+            {{ __('Tambah Data Pengguna Parkir') }}
         </h2>
     </x-slot>
 
@@ -15,7 +15,7 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div class="flex-1 flex items-center px-4 py-2">
                         <h5>
-                            <span class="text-gray-800 font-semibold">Tambah Data User</span>
+                            <span class="text-gray-800 font-semibold">Tambah Data Pengguna</span>
                         </h5>
                     </div>
                 </div>
@@ -37,18 +37,18 @@
                         </div>
                         <div class="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-4">
                             <div>
-                                <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Nama</label>
+                                <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Nama Lengkap</label>
                                 <input type="text" name="name" id="name"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    placeholder="Masukkan Nama" required="" value="{{ old('name') }}">
+                                    placeholder="Masukkan Nama Lengkap" required="" value="{{ old('name') }}">
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
                             <div>
                                 <label for="username"
-                                    class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900">Nama Pengguna</label>
                                 <input type="text" name="username" id="username"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    placeholder="Masukkan Username" required="" value="{{ old('username') }}">
+                                    placeholder="Masukkan Nama Pengguna" required="" value="{{ old('username') }}">
                                 <x-input-error :messages="$errors->get('username')" class="mt-2" />
                             </div>
                             <div>
@@ -66,7 +66,7 @@
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                     required>
                                         <option value="admin">Admin</option>
-                                        <option value="attendant">Attendant</option>
+                                        <option value="attendant">Petugas</option>
                                         <option value="owner">Owner</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('role')" class="mt-2" />
@@ -77,8 +77,8 @@
                                 <select id="status" name="status"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                     required>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="active">Aktif</option>
+                                        <option value="inactive">Tidak Aktif</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
@@ -91,7 +91,7 @@
                                     <path clip-rule="evenodd" fill-rule="evenodd"
                                         d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                                 </svg>
-                                Tambah Data User
+                                Tambah Data Pengguna
                             </button>
                         </div>
                     </form>

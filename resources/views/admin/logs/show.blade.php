@@ -39,7 +39,7 @@
                     </div>
 
                     <div class="mt-6">
-                        <a href="{{ route('owner.logs.index') }}" class="text-blue-600">&larr; Kembali ke daftar</a>
+                        <a href="{{ route('admin.logs.index') }}" class="text-blue-600">&larr; Kembali ke daftar</a>
                     </div>
 
                 </div>

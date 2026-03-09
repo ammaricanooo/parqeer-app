@@ -29,6 +29,7 @@ class LoginRequest extends FormRequest
         return [
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
+            //'captcha'  => ['required', 'string'],
         ];
     }
 
@@ -40,6 +41,13 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+        // server-side captcha verification (defensive: ensure captcha cannot be bypassed)
+        // if (!\Mews\Captcha\Facades\Captcha::check($this->input('captcha'))) {
+        //     RateLimiter::hit($this->throttleKey());
+        //     throw ValidationException::withMessages([
+        //         'captcha' => 'Captcha salah atau kosong.',
+        //     ]);
+        // }
 
         $user = \App\Models\User::where('username', $this->input('username'))->first();
 
@@ -89,6 +97,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')) . '|' . $this->ip());
     }
 }

@@ -7,11 +7,15 @@ use App\Models\Vehicle;
 use App\Models\Area;
 use App\Models\Rate;
 use App\Models\LogActivity;
+use App\Services\TicketService;
+use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
-use Illuminate\View\View; 
+use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -48,7 +52,7 @@ class TransactionController extends Controller
             'entry_time' => 'required|date',
         ]);
 
-        // Get area and infer rate (area must have exactly 1 rate configured for consistency)
+        // Get area and check rates
         $area = Area::with('rates')->findOrFail($validated['area_id']);
         if ($area->rates->count() === 0) {
             return redirect()->back()->withInput()->with('error', 'Area tidak memiliki tarif terkonfigurasi. Hubungi admin.');
@@ -67,54 +71,59 @@ class TransactionController extends Controller
                 ->with('error', 'Area yang dipilih sudah penuh. Silakan pilih area lain.');
         }
 
-        // Pastikan kita punya key vehicle_id (bisa tidak dikirim) dan gunakan pengecekan aman
-        $vehicleId = $validated['vehicle_id'] ?? null;
+        // Atomic transaction: Create vehicle, transaction, and log activity together
+        try {
+            $transaction = DB::transaction(function () use ($validated, $area, $rate) {
+                // Pastikan kita punya key vehicle_id (bisa tidak dikirim) dan gunakan pengecekan aman
+                $vehicleId = $validated['vehicle_id'] ?? null;
 
-        // Jika vehicle_id tidak ada, cari berdasarkan plate_number atau buat yang baru
-        if (!$vehicleId) {
-            $vehicle = Vehicle::where('plate_number', $validated['plate_number'])->first();
-            if (!$vehicle) {
-                $vehicle = Vehicle::create([
+                // Jika vehicle_id tidak ada, cari berdasarkan plate_number atau buat yang baru
+                if (!$vehicleId) {
+                    $vehicle = Vehicle::where('plate_number', $validated['plate_number'])->first();
+                    if (!$vehicle) {
+                        $vehicle = Vehicle::create([
+                            'plate_number' => $validated['plate_number'],
+                            'color' => $validated['vehicle_color'],
+                            'type' => $rate->vehicle_type,
+                        ]);
+                    }
+                    $validated['vehicle_id'] = $vehicle->id;
+                }
+
+                // Tambahkan user_id dan rate_id
+                $validated['user_id'] = Auth::id();
+                $validated['rate_id'] = $rate->id;
+                $validated['status'] = 'in';
+
+                // Konversi entry_time string ke datetime
+                $validated['entry_time'] = Carbon::parse($validated['entry_time']);
+
+                // Buat transaksi baru
+                $transaction = Transaction::create($validated);
+
+                // Update occupancy area (satu kendaraan masuk)
+                $area->updateOccupancy();
+
+                // Catat ke log activity
+                LogActivity::create([
+                    'transaction_id' => $transaction->id,
+                    'vehicle_id' => $validated['vehicle_id'],
+                    'user_id' => Auth::id(),
+                    'activity' => 'entry',
                     'plate_number' => $validated['plate_number'],
-                    'color' => $validated['vehicle_color'],
-                    'type' => $rate->vehicle_type, // infer type from area's rate
+                    'vehicle_color' => $validated['vehicle_color'],
+                    'description' => 'Kendaraan masuk di area ' . $area->name . ' pada ' . $validated['entry_time']->format('Y-m-d H:i'),
                 ]);
-            }
-            $validated['vehicle_id'] = $vehicle->id;
-            $vehicleId = $vehicle->id;
+
+                return $transaction;
+            });
+
+            // Redirect ke halaman struk entry agar petugas dapat cetak/scan QR
+            return redirect()->route('attendant.transaction.entry-receipt', $transaction->id)
+                ->with('success', 'Kendaraan masuk dicatat. ID Transaksi: ' . $transaction->id);
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal merekam kendaraan masuk. Silakan coba lagi.');
         }
-
-        // pastikan variable tersedia untuk penggunaan berikutnya
-        $validated['vehicle_id'] = $validated['vehicle_id'] ?? $vehicleId;
-
-        // Tambahkan user_id dan rate_id
-        $validated['user_id'] = Auth::id();
-        $validated['rate_id'] = $rate->id;
-        $validated['status'] = 'in';
-        
-        // Konversi entry_time string ke datetime
-        $validated['entry_time'] = Carbon::parse($validated['entry_time']);
-
-        // Buat transaksi baru
-        $transaction = Transaction::create($validated);
-
-        // Update occupancy area (satu kendaraan masuk)
-        $area->updateOccupancy();
-
-        // Catat ke log activity
-        LogActivity::create([
-            'transaction_id' => $transaction->id,
-            'vehicle_id' => $validated['vehicle_id'],
-            'user_id' => Auth::id(),
-            'activity' => 'entry',
-            'plate_number' => $validated['plate_number'],
-            'vehicle_color' => $validated['vehicle_color'],
-            'description' => 'Kendaraan masuk di area ' . $area->name . ' pada ' . $validated['entry_time']->format('Y-m-d H:i'),
-        ]);
-
-        // Redirect ke halaman struk entry agar petugas dapat cetak/scan QR
-        return redirect()->route('attendant.transaction.entry-receipt', $transaction->id)
-            ->with('success', 'Kendaraan masuk dicatat. ID Transaksi: ' . $transaction->id);
     }
 
     /**
@@ -139,12 +148,14 @@ class TransactionController extends Controller
     }
 
     /**
-     * Tampilkan struk entry (setelah kendaraan masuk) dengan QR untuk cetak
+     * Download tiket entry dalam format PDF (DOMPDF)
      */
-    public function entryReceipt(Transaction $transaction): View
+    public function entryReceipt(Transaction $transaction): Response
     {
         $this->authorize('view', $transaction);
-        return view('attendant.transaction.entry_receipt', compact('transaction'));
+
+        $ticketService = new TicketService();
+        return $ticketService->generateEntryTicketPdf($transaction);
     }
 
     /**
@@ -170,7 +181,7 @@ class TransactionController extends Controller
     public function showExit(Transaction $transaction): View
     {
         if ($transaction->exit_time) {
-            return abort(403, 'Transaksi ini sudah selesai.');
+            abort(403, 'Transaksi ini sudah selesai.');
         }
 
         return view('attendant.transaction.exit', compact('transaction'));
@@ -191,26 +202,32 @@ class TransactionController extends Controller
             'exit_time' => 'required|date'
         ]);
 
-        // Update transaksi dengan exit time
-        $exitTime = Carbon::parse($validated['exit_time']);
-        $transaction->processExit($exitTime);
+        try {
+            DB::transaction(function () use ($request, $transaction, $validated) {
+                // Update transaksi dengan exit time
+                $exitTime = Carbon::parse($validated['exit_time']);
+                $transaction->processExit($exitTime);
 
-        // Update occupancy area (kendaraan keluar)
-        $transaction->area->updateOccupancy();
+                // Update occupancy area (kendaraan keluar)
+                $transaction->area->updateOccupancy();
 
-        // Catat ke log activity (keluar)
-        LogActivity::create([
-            'transaction_id' => $transaction->id,
-            'vehicle_id' => $transaction->vehicle_id,
-            'user_id' => Auth::id(),
-            'activity' => 'exit',
-            'plate_number' => $transaction->plate_number,
-            'vehicle_color' => $transaction->vehicle_color,
-            'description' => 'Kendaraan keluar. Durasi: ' . $transaction->duration_minutes . ' menit. Total: ' . number_format($transaction->amount, 2),
-        ]);
+                // Catat ke log activity (keluar)
+                LogActivity::create([
+                    'transaction_id' => $transaction->id,
+                    'vehicle_id' => $transaction->vehicle_id,
+                    'user_id' => Auth::id(),
+                    'activity' => 'exit',
+                    'plate_number' => $transaction->plate_number,
+                    'vehicle_color' => $transaction->vehicle_color,
+                    'description' => 'Kendaraan keluar. Durasi: ' . $transaction->duration_minutes . ' menit. Total: ' . number_format((float) $transaction->amount, 2),
+                ]);
+            });
 
-        return redirect()->route('attendant.transaction.receipt', $transaction->id)
-            ->with('success', 'Kendaraan keluar dicatat. Silahkan cetak struk.');
+            return redirect()->route('attendant.transaction.receipt', $transaction->id)
+                ->with('success', 'Kendaraan keluar dicatat. Silahkan cetak struk.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mencatat kendaraan keluar. Silakan coba lagi.');
+        }
     }
 
     /**
@@ -233,16 +250,33 @@ class TransactionController extends Controller
     }
 
     /**
-     * Menampilkan struk/receipt untuk dicetak
+     * Tampilkan receipt dengan form pembayaran
      */
-    public function receipt(Transaction $transaction): View|RedirectResponse
+    public function receipt(Transaction $transaction): Response|View|RedirectResponse
     {
+        $this->authorize('view', $transaction);
+
         if (!$transaction->exit_time) {
             return redirect()->route('attendant.transaction.index')
                 ->with('error', 'Transaksi belum selesai.');
         }
 
-        return view('attendant.transaction.receipt', compact('transaction'));
+        return view('attendant.transaction.show-receipt', compact('transaction'));
+    }
+
+    /**
+     * Download tiket keluar dalam format PDF (DOMPDF)
+     */
+    public function downloadExitReceipt(Transaction $transaction): Response
+    {
+        $this->authorize('view', $transaction);
+
+        if (!$transaction->exit_time) {
+            abort(403, 'Transaksi belum selesai.');
+        }
+
+        $ticketService = new TicketService();
+        return $ticketService->generateExitTicketPdf($transaction);
     }
 
     /**
@@ -258,12 +292,50 @@ class TransactionController extends Controller
             'paid_amount' => 'required|numeric|min:' . $transaction->amount,
         ]);
 
-        // Update status transaksi
-        $transaction->status = 'paid';
-        $transaction->save();
+        try {
+            DB::transaction(function () use ($validated, $transaction) {
+                // Store paid amount and calculate change
+                $paidAmount = (float) $validated['paid_amount'];
+                $change = $paidAmount - (float) $transaction->amount;
 
-        return redirect()->route('attendant.transaction.index')
-            ->with('success', 'Pembayaran berhasil. Struk telah dicetak.');
+                // Update transaction with payment info
+                $transaction->paid_amount = $paidAmount;
+                $transaction->change = $change;
+                $transaction->status = 'paid';
+                $transaction->save();
+
+                // Log payment activity
+                LogActivity::create([
+                    'transaction_id' => $transaction->id,
+                    'vehicle_id' => $transaction->vehicle_id,
+                    'user_id' => Auth::id(),
+                    'activity' => 'payment',
+                    'plate_number' => $transaction->plate_number,
+                    'vehicle_color' => $transaction->vehicle_color,
+                    'description' => 'Pembayaran: Rp ' . number_format((float) $transaction->amount, 2) . ' | Dibayar: Rp ' . number_format($paidAmount, 2) . ' | Kembalian: Rp ' . number_format($change, 2),
+                ]);
+            });
+
+            return redirect()->route('attendant.transaction.index')
+                ->with('success', 'Pembayaran berhasil. Struk telah dicetak.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses pembayaran. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Download struk pembayaran dalam format PDF (DOMPDF)
+     */
+    public function downloadPaymentReceipt(Transaction $transaction): Response
+    {
+        $this->authorize('view', $transaction);
+
+        if ($transaction->status !== 'paid') {
+            abort(403, 'Transaksi belum dibayar.');
+        }
+
+        $ticketService = new TicketService();
+        return $ticketService->generatePaymentReceiptPdf($transaction);
     }
 
     /**
@@ -287,7 +359,7 @@ class TransactionController extends Controller
     public function searchVehicle(Request $request)
     {
         $search = $request->get('q');
-        
+
         if (strlen($search) < 2) {
             return response()->json([]);
         }

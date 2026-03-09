@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="title">
-        Rate
+        Tambah Data Tarif Parkir
     </x-slot>
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Data Rate') }}
+            {{ __('Tambah Data Tarif Parkir') }}
         </h2>
     </x-slot>
 
@@ -15,7 +15,7 @@
 
                 <!-- Title -->
                 <div class="flex items-center px-4 py-2">
-                    <h5 class="text-gray-800 font-semibold">Tambah Data Rate</h5>
+                    <h5 class="text-gray-800 font-semibold">Tambah Data Tarif Parkir</h5>
                 </div>
 
                 <div class="mx-4 py-4 border-t"></div>
@@ -86,7 +86,7 @@
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                             </svg>
-                            Tambah Data Rate
+                            Tambah Data Tarif Parkir
                         </button>
                     </div>
 

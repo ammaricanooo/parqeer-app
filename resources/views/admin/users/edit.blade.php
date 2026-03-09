@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="title">
-        User
+        Pengguna
     </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Data User') }}
+            {{ __('Edit Data Pengguna') }}
         </h2>
     </x-slot>
 
@@ -15,7 +15,7 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div class="flex-1 flex items-center px-4 py-2">
                         <h5>
-                            <span class="text-gray-800 font-semibold">Edit Data User</span>
+                            <span class="text-gray-800 font-semibold">Edit Data Pengguna</span>
                         </h5>
                     </div>
                 </div>
@@ -23,7 +23,8 @@
                     class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t">
                 </div>
                 <div class="">
-                    <form method="POST" action="{{ route('admin.users.update', $user->id) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('admin.users.update', $user->id) }}"
+                        enctype="multipart/form-data">
                         @method('PUT')
                         @csrf
                         <div class="grid mb-4 sm:col-span-2 md:mb-6 sm:grid-cols-4">
@@ -38,18 +39,19 @@
                         </div>
                         <div class="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-4">
                             <div>
-                                <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Nama</label>
+                                <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Nama Lengkap</label>
                                 <input type="text" name="name" id="name"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    placeholder="Masukkan Nama" required="" value="{{ old('name', $user->name) }}">
+                                    placeholder="Masukkan Nama Lengkap" required="" value="{{ old('name', $user->name) }}">
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
                             <div>
                                 <label for="username"
-                                    class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900">Nama Pengguna</label>
                                 <input type="text" name="username" id="username"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    placeholder="Masukkan Username" required="" value="{{ old('username', $user->username) }}">
+                                    placeholder="Masukkan Nama Pengguna" required=""
+                                    value="{{ old('username', $user->username) }}">
                                 <x-input-error :messages="$errors->get('username')" class="mt-2" />
                             </div>
                             <div>
@@ -61,29 +63,34 @@
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                             </div>
                             <div>
-    <label for="role"
-        class="block mb-2 text-sm font-medium text-gray-900">Role</label>
-    <select id="role" name="role"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-        required>
-        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-        <option value="attendant" {{ old('role', $user->role) == 'attendant' ? 'selected' : '' }}>attendant</option>
-        <option value="owner" {{ old('role', $user->role) == 'owner' ? 'selected' : '' }}>Owner</option>
-    </select>
-    <x-input-error :messages="$errors->get('role')" class="mt-2" />
-</div>
+                                <label for="role" class="block mb-2 text-sm font-medium text-gray-900">Role</label>
+                                <select id="role" name="role"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                    required>
+                                    <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>
+                                        Admin</option>
+                                    <option value="attendant"
+                                        {{ old('role', $user->role) == 'attendant' ? 'selected' : '' }}>Petugas</option>
+                                    <option value="owner" {{ old('role', $user->role) == 'owner' ? 'selected' : '' }}>
+                                        Owner</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                            </div>
 
                             <div>
-    <label for="status"
-        class="block mb-2 text-sm font-medium text-gray-900">Status</label>
-    <select id="status" name="status"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-        required>
-        <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>Active</option>
-        <option value="inactive" {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
-    </select>
-    <x-input-error :messages="$errors->get('status')" class="mt-2" />
-</div>
+                                <label for="status"
+                                    class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                                <select id="status" name="status"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                    required>
+                                    <option value="active"
+                                        {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="inactive"
+                                        {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>Tidak Aktif
+                                    </option>
+                                </select>
+                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                            </div>
 
                         </div>
                         <div class="block w-full mt-4">
@@ -94,7 +101,7 @@
                                     <path clip-rule="evenodd" fill-rule="evenodd"
                                         d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                                 </svg>
-                                Edit Data User
+                                Edit Data Pengguna
                             </button>
                         </div>
                     </form>

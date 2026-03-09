@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <img class="w-20" src="/img/logo.png" alt="diskominfo" />
                     </a>
                 </div>
 
@@ -25,18 +25,24 @@
                         <x-nav-link :href="route('admin.areas.index')" :active="request()->routeIs('admin.areas.index')">
                             {{ __('Area Parkir') }}
                         </x-nav-link>
-                    @endif
-                    @if (Auth::user()->role === 'attendant')
-                        <x-nav-link :href="route('attendant.vehicles.index')" :active="request()->routeIs('attendant.vehicles.index')">
+                        <x-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.index')">
                             {{ __('Vehicles') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.logs.index')" :active="request()->routeIs('admin.logs.index')">
+                            {{ __('Logs Aktivitas') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->role === 'attendant')
                         <x-nav-link :href="route('attendant.transaction.index')" :active="request()->routeIs('attendant.transaction.index')">
                             {{ __('Transactions') }}
                         </x-nav-link>
                     @endif
                     @if (Auth::user()->role === 'owner')
-                        <x-nav-link :href="route('owner.logs.index')" :active="request()->routeIs('owner.logs.index')">
-                            {{ __('Logs Aktivitas') }}
+                        <x-nav-link :href="route('owner.dashboard')" :active="request()->routeIs('owner.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('owner.laporan')" :active="request()->routeIs('owner.laporan')">
+                            {{ __('Laporan') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -102,18 +108,24 @@
                 <x-responsive-nav-link :href="route('admin.areas.index')" :active="request()->routeIs('admin.areas.index')">
                     {{ __('Area Parkir') }}
                 </x-responsive-nav-link>
-            @endif
-            @if (Auth::user()->role === 'attendant')
-                <x-responsive-nav-link :href="route('attendant.vehicles.index')" :active="request()->routeIs('attendant.vehicles.index')">
+                <x-responsive-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.index')">
                     {{ __('Vehicles') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.logs.index')" :active="request()->routeIs('admin.logs.index')">
+                    {{ __('Logs Aktivitas') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->role === 'attendant')
                 <x-responsive-nav-link :href="route('attendant.transaction.index')" :active="request()->routeIs('attendant.transaction.index')">
                     {{ __('Transactions') }}
                 </x-responsive-nav-link>
             @endif
             @if (Auth::user()->role === 'owner')
-                <x-responsive-nav-link :href="route('owner.logs.index')" :active="request()->routeIs('owner.logs.index')">
-                    {{ __('Logs Aktivitas') }}
+                <x-responsive-nav-link :href="route('owner.dashboard')" :active="request()->routeIs('owner.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('owner.laporan')" :active="request()->routeIs('owner.laporan')">
+                    {{ __('Laporan') }}
                 </x-responsive-nav-link>
             @endif
         </div>
