@@ -79,12 +79,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Entry ticket QR selalu mengarah ke pembayaran publik
-            const qrUrl = '{{ route('payment.public', $transaction->id) }}';
+            // Entry ticket QR: payload {id, status}.
+            const qrPayload = {
+                id: {{ $transaction->id }},
+                status: '{{ in_array($transaction->status, ['paid', 'out']) ? 'out' : 'in' }}'
+            };
 
             // Setup QR Code
             new QRCode(document.getElementById("qrcode"), {
-                text: qrUrl,
+                text: JSON.stringify(qrPayload),
                 width: 140,
                 height: 140,
                 colorDark : "#000000",

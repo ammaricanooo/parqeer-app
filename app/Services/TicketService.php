@@ -89,15 +89,20 @@ class TicketService
      */
     private function generateQrCodeBase64(Transaction $transaction): string
     {
-        // Entry ticket QR harus tetap satu URL (scan gate)
-        // Saat scan gate, akan otomatis cek status: bayar / keluar
-        $url = route('transaction.scan-ticket', $transaction->id);
+        // QR payload sederhana: ID + status.
+        // status adalah 'out' untuk transaksi sudah dibayar/keluar, 'in' untuk belum.
+        $payload = [
+            'id' => $transaction->id,
+            'status' => in_array($transaction->status, ['paid', 'out']) ? 'out' : 'in',
+        ];
+
+        $content = json_encode($payload);
 
         $svg = QrCode::format('svg')
             ->size(200)
             ->margin(1)
             ->errorCorrection('H')
-            ->generate($url);
+            ->generate($content);
 
         // Encode ke Base64 agar Dompdf bisa baca sebagai image source
         return 'data:image/svg+xml;base64,' . base64_encode($svg);

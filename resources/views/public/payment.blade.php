@@ -60,21 +60,17 @@
                     </h2>
                 </div>
 
-                <div class="space-y-4">
-                    @if($paymentGatewayUrl)
-                        <a href="{{ $paymentGatewayUrl }}" target="_blank" 
-                           class="group w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 px-6 rounded-3xl transition-all shadow-lg shadow-indigo-200 active:scale-95">
-                            <span class="text-xl">💳</span>
-                            <span>BAYAR SEKARANG</span>
-                        </a>
-                    @endif
+                <form action="{{ route('payment.public.pay', $transaction->id) }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div class="text-left">
+                        <label class="font-bold text-sm text-gray-600">Jumlah Pembayaran (Rp)</label>
+                        <input type="number" name="paid_amount" id="paid_amount" required min="{{ $transaction->amount }}" value="{{ $transaction->amount }}" class="w-full mt-2 p-3 rounded-xl border border-gray-200" />
+                    </div>
 
-                    <button onclick="checkPaymentStatus()" id="checkBtn"
-                            class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-100 hover:border-indigo-100 text-gray-600 font-bold py-4 px-6 rounded-3xl transition-all active:bg-gray-50">
-                        <span id="checkIcon" class="inline-block">🔄</span>
-                        <span id="checkText">CEK STATUS</span>
+                    <button type="submit" class="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-6 rounded-3xl transition-all shadow-lg shadow-indigo-200 active:scale-95">
+                        💵 BAYAR SEKARANG
                     </button>
-                </div>
+                </form>
 
                 <div class="mt-8 p-4 bg-blue-50/50 rounded-2xl flex items-start gap-3">
                     <span class="text-lg">💡</span>
@@ -98,68 +94,6 @@
         </p>
     </div>
 
-    <script>
-        let checkCount = 0;
-        const maxChecks = 30; // 30 kali check (sekitar 5 menit)
-        const btn = document.getElementById('checkBtn');
-        const btnText = document.getElementById('checkText');
-        const btnIcon = document.getElementById('checkIcon');
 
-        function updateUI(status) {
-            if (status === 'paid' || status === 'out') {
-                const indicator = document.getElementById('statusIndicator');
-                indicator.innerHTML = `
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-[10px] font-black text-green-600 uppercase tracking-widest text-sm">LUNAS</span>
-                `;
-                
-                // Success State on Button
-                btn.className = "w-full flex items-center justify-center gap-3 bg-green-600 text-white font-black py-4 px-6 rounded-3xl transition-all";
-                btnText.innerText = "PEMBAYARAN BERHASIL!";
-                btnIcon.innerText = "✅";
-
-                setTimeout(() => {
-                    window.location.href = `/payment/success?order_id=TXN-{{ $transaction->id }}`;
-                }, 1500);
-            }
-        }
-
-        async function checkPaymentStatus() {
-            if (checkCount >= maxChecks) return;
-
-            // Visual feedback
-            btnIcon.classList.add('animate-spin');
-            btnText.innerText = "MEMERIKSA...";
-
-            try {
-                const response = await fetch(`/attendant/transaction/{{ $transaction->id }}/current-amount`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const data = await response.json();
-
-                if (data.status === 'paid' || data.status === 'out') {
-                    updateUI(data.status);
-                } else {
-                    checkCount++;
-                    // Reset button if manual check
-                    setTimeout(() => {
-                        btnIcon.classList.remove('animate-spin');
-                        btnText.innerText = "CEK STATUS";
-                    }, 1000);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Auto polling every 10s
-        const autoCheck = setInterval(() => {
-            if (checkCount < maxChecks) {
-                checkPaymentStatus();
-            } else {
-                clearInterval(autoCheck);
-            }
-        }, 10000);
-    </script>
 </body>
 </html>

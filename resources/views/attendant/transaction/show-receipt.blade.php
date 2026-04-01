@@ -75,47 +75,29 @@
 
                     @if(!$isPaid)
                         <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl p-8 border border-gray-100 dark:border-gray-700 h-full">
-                            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-8 italic">Metode Bayar</h3>
-                            
-                            <div class="flex p-1.5 bg-gray-100 dark:bg-gray-900 rounded-2xl mb-8">
-                                <button id="cash-tab" class="flex-1 py-3 text-sm font-black rounded-xl transition-all bg-white dark:bg-gray-800 shadow-sm text-blue-600">TUNAI</button>
-                                <button id="qris-tab" class="flex-1 py-3 text-sm font-black rounded-xl transition-all text-gray-400 hover:text-gray-600">QRIS (OTOMATIS)</button>
-                            </div>
+                            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-8 italic">Form Pembayaran Tunai</h3>
 
-                            <div id="cash-panel">
-                                <form action="{{ route('attendant.transaction.pay', $transaction->id) }}" method="POST" class="flex flex-col gap-6">
-                                    @csrf
-                                    <div>
-                                        <label class="block text-xs font-black text-gray-400 uppercase mb-3">Uang yang Diterima</label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-2xl text-gray-300">Rp</span>
-                                            <input type="number" name="paid_amount" id="paid_amount" 
-                                                class="w-full pl-16 pr-4 py-6 bg-gray-50 dark:bg-gray-900 border-none rounded-3xl text-3xl font-black focus:ring-4 focus:ring-blue-500/20"
-                                                value="{{ $amount }}" min="{{ $amount }}" step="1000" required autofocus>
-                                        </div>
+                            <form action="{{ route('attendant.transaction.pay', $transaction->id) }}" method="POST" class="flex flex-col gap-6">
+                                @csrf
+                                <div>
+                                    <label class="block text-xs font-black text-gray-400 uppercase mb-3">Jumlah yang Dibayar</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-2xl text-gray-300">Rp</span>
+                                        <input type="number" name="paid_amount" id="paid_amount" 
+                                            class="w-full pl-16 pr-4 py-6 bg-gray-50 dark:bg-gray-900 border-none rounded-3xl text-3xl font-black focus:ring-4 focus:ring-blue-500/20"
+                                            value="{{ $amount }}" min="{{ $amount }}" step="1000" required autofocus>
                                     </div>
-
-                                    <div id="change-card" class="p-6 bg-green-50 dark:bg-green-900/20 rounded-3xl border-2 border-dashed border-green-200 dark:border-green-800 hidden">
-                                        <p class="text-xs font-black text-green-600 uppercase mb-1">Kembalian</p>
-                                        <p id="change-text" class="text-4xl font-black text-green-700 dark:text-green-400 leading-none">Rp 0</p>
-                                    </div>
-
-                                    <button type="submit" class="w-full py-6 bg-gray-900 dark:bg-blue-600 text-white rounded-3xl font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
-                                        SELESAIKAN BAYAR
-                                    </button>
-                                </form>
-                            </div>
-
-                            <div id="qris-panel" class="hidden text-center py-10">
-                                <div class="w-24 h-24 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 17h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                 </div>
-                                <h4 class="text-xl font-black text-gray-900 dark:text-white mb-2">Scan QRIS</h4>
-                                <p class="text-gray-500 mb-8 px-4">Sistem akan otomatis memperbarui tampilan setelah pembayaran terverifikasi.</p>
-                                <a href="{{ $paymentGatewayUrl }}" target="_blank" class="px-8 py-4 bg-blue-600 text-white font-black rounded-2xl inline-block">
-                                    BUKA PORTAL QRIS
-                                </a>
-                            </div>
+
+                                <div id="change-card" class="p-6 bg-green-50 dark:bg-green-900/20 rounded-3xl border-2 border-dashed border-green-200 dark:border-green-800 hidden">
+                                    <p class="text-xs font-black text-green-600 uppercase mb-1">Kembalian</p>
+                                    <p id="change-text" class="text-4xl font-black text-green-700 dark:text-green-400 leading-none">Rp 0</p>
+                                </div>
+
+                                <button type="submit" class="w-full py-6 bg-gray-900 dark:bg-blue-600 text-white rounded-3xl font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
+                                    SELESAIKAN BAYAR dan KELUAR
+                                </button>
+                            </form>
                         </div>
                     @else
                         <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl p-10 flex flex-col items-center justify-center text-center h-full border-4 border-green-500">
@@ -142,25 +124,6 @@
             const changeCard = document.getElementById('change-card');
             const changeText = document.getElementById('change-text');
 
-            // 1. Tabbing Logic
-            const cashTab = document.getElementById('cash-tab');
-            const qrisTab = document.getElementById('qris-tab');
-            const cashPanel = document.getElementById('cash-panel');
-            const qrisPanel = document.getElementById('qris-panel');
-
-            const switchTab = (activeTab, inactiveTab, activePanel, inactivePanel) => {
-                activeTab.classList.add('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-blue-600');
-                activeTab.classList.remove('text-gray-400');
-                inactiveTab.classList.remove('bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-blue-600');
-                inactiveTab.classList.add('text-gray-400');
-                activePanel.classList.remove('hidden');
-                inactivePanel.classList.add('hidden');
-            };
-
-            cashTab?.addEventListener('click', () => switchTab(cashTab, qrisTab, cashPanel, qrisPanel));
-            qrisTab?.addEventListener('click', () => switchTab(qrisTab, cashTab, qrisPanel, cashPanel));
-
-            // 2. Real-time Change
             paidInput?.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value) || 0;
                 if (val > amountTotal) {
@@ -171,19 +134,6 @@
                     changeCard.classList.add('hidden');
                 }
             });
-
-            // 3. Polling Status (Fast - 3s)
-            @if(!$isPaid)
-                setInterval(async () => {
-                    try {
-                        const res = await fetch('{{ route("attendant.transaction.current-amount", $transaction->id) }}');
-                        const data = await res.json();
-                        if (data.status === 'paid' || data.status === 'out') {
-                            window.location.href = "{{ route('attendant.transaction.payment-confirmed', $transaction->id) }}";
-                        }
-                    } catch (e) {}
-                }, 3000);
-            @endif
         });
     </script>
 </x-app-layout>

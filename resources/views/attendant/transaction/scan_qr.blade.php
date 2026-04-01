@@ -88,16 +88,33 @@
                 statusBox.textContent = "QR Terdeteksi! Mengalihkan...";
                 statusBox.classList.replace('bg-gray-100', 'bg-green-100');
                 statusBox.classList.add('text-green-700');
-                
-                // Cek apakah outputnya URL atau ID
+
+                // JSON payload {id, status} atau URL / ID lama
+                try {
+                    const payload = JSON.parse(decodedText);
+                    if (payload && payload.id) {
+                        if (payload.status && payload.status.toLowerCase() === 'out') {
+                            window.location.href = `{{ url('transaction') }}/${payload.id}/scan-ticket`;
+                        } else {
+                            window.location.href = `{{ url('payment') }}/${payload.id}`;
+                        }
+                        return;
+                    }
+                } catch (e) {
+                    // ignored, fallback ke URL/ID-proses lama
+                }
+
                 try {
                     const url = new URL(decodedText);
                     window.location.href = decodedText;
+                    return;
                 } catch (e) {
-                    const id = decodedText.trim();
-                    if (id) {
-                        window.location.href = `{{ url('attendant/transaction') }}/${id}/exit`;
-                    }
+                    // not a URL
+                }
+
+                const id = decodedText.trim();
+                if (id) {
+                    window.location.href = `{{ url('payment') }}/${id}`;
                 }
             }
 

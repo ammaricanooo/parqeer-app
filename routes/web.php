@@ -56,17 +56,12 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
     Route::delete('/vehicle/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 });
 
-// Payment Gateway routes
-Route::post('/attendant/payment/callback', [TransactionController::class, 'handlePaymentCallback'])->name('payment.callback');
-Route::get('/attendant/payment/success', [TransactionController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/attendant/payment/failed', [TransactionController::class, 'paymentFailed'])->name('payment.failed');
-Route::get('/attendant/transaction/{transaction}/payment-confirmed', [TransactionController::class, 'paymentConfirmed'])->name('attendant.transaction.payment-confirmed');
-
 // Public gate scan ticket (dapat diakses tanpa login)
 Route::get('/transaction/{transaction}/scan-ticket', [TransactionController::class, 'scanTicket'])->name('transaction.scan-ticket');
 
 // Public payment page (dapat diakses tanpa login - untuk scan QR dari tiket)
 Route::get('/payment/{transaction}', [TransactionController::class, 'publicPayment'])->name('payment.public');
+Route::post('/payment/{transaction}/pay', [TransactionController::class, 'publicProcessPayment'])->name('payment.public.pay');
 
 // Dashboard admin (rekap cepat untuk admin)
 // Dashboard admin (summary + area table + top transactions)

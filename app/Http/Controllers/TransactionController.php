@@ -7,7 +7,6 @@ use App\Models\Vehicle;
 use App\Models\Area;
 use App\Models\Rate;
 use App\Models\LogActivity;
-use App\Services\PaymentGatewayService;
 use App\Services\TicketService;
 use App\Helpers\ViewHelper;
 use Illuminate\Http\Request;
@@ -292,7 +291,6 @@ class TransactionController extends Controller
     {
         $this->authorize('update', $transaction);
 
-        // Hanya bisa bayar jika status 'in' (belum bayar)
         if ($transaction->status !== 'in') {
             return redirect()->back()->with('error', 'Status transaksi: ' . $transaction->status . '. Hanya transaksi dengan status "in" yang bisa diproses pembayaran.');
         }
@@ -303,24 +301,24 @@ class TransactionController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($request, $transaction, $validated) {
-                // Hitung durasi dan process pembayaran
+            DB::transaction(function () use ($transaction, $validated) {
                 $transaction->processPayment((float) $validated['paid_amount']);
+                $transaction->processExit(now());
+                $transaction->area->updateOccupancy();
 
-                // Catat ke log activity (pembayaran)
                 LogActivity::create([
                     'transaction_id' => $transaction->id,
                     'vehicle_id' => $transaction->vehicle_id,
                     'user_id' => Auth::id(),
-                    'activity' => 'payment',
+                    'activity' => 'payment_exit',
                     'plate_number' => $transaction->plate_number,
                     'vehicle_color' => $transaction->vehicle_color,
-                    'description' => 'Pembayaran: Rp ' . number_format((float) $transaction->amount, 2) . ' | Dibayar: Rp ' . number_format($transaction->paid_amount, 2) . ' | Kembalian: Rp ' . number_format($transaction->change, 2),
+                    'description' => 'Pembayaran & keluar: Rp ' . number_format((float) $transaction->amount, 2),
                 ]);
             });
 
             return redirect()->route('attendant.transaction.index')
-                ->with('success', 'Pembayaran berhasil dicatat. Status: paid. Kendaraan siap keluar.');
+                ->with('success', 'Pembayaran selesai dan kendaraan keluar.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -436,16 +434,8 @@ class TransactionController extends Controller
     {
         $this->authorize('view', $transaction);
 
-        //dd($transaction);
-
-        // Generate payment gateway URL jika belum dibayar
-        $paymentGatewayUrl = null;
-        if ($transaction->status !== 'paid') {
-            $paymentGatewayService = new PaymentGatewayService();
-            $paymentGatewayUrl = $paymentGatewayService->generatePaymentUrl($transaction);
-        }
-
-        return view('attendant.transaction.show-receipt', compact('transaction', 'paymentGatewayUrl'));
+        // Tidak menggunakan QRIS gateway lagi: tampilkan form payment internal.
+        return view('attendant.transaction.show-receipt', compact('transaction'));
     }
 
     /**
@@ -527,89 +517,6 @@ class TransactionController extends Controller
         return response()->json($vehicles);
     }
 
-    /**
-     * Handle callback dari Payment Gateway Pakasir
-     */
-    public function handlePaymentCallback(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $paymentGatewayService = new PaymentGatewayService();
-        $result = $paymentGatewayService->handleCallback($request);
-
-        if ($result['success']) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Payment processed successfully',
-                'transaction_id' => $result['transaction_id']
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'error',
-            'message' => $result['message'],
-            'transaction_amount' => $result['transaction_amount'] ?? null,
-            'webhook_amount' => $result['webhook_amount'] ?? null,
-        ], 400);
-    }
-
-    /**
-     * Handle redirect setelah pembayaran berhasil dari Payment Gateway
-     */
-    public function paymentSuccess(Request $request): RedirectResponse
-    {
-        $orderId = $request->get('order_id');
-
-        if (!$orderId) {
-            return redirect()->route('attendant.transaction.index')
-                ->with('error', 'Order ID tidak ditemukan.');
-        }
-
-        // Extract transaction ID dari order_id
-        $parts = explode('-', $orderId);
-        $transactionId = $parts[1] ?? null;
-
-        if (!$transactionId) {
-            return redirect()->route('attendant.transaction.index')
-                ->with('error', 'Format Order ID tidak valid.');
-        }
-
-        $transaction = Transaction::find($transactionId);
-
-        if (!$transaction) {
-            return redirect()->route('attendant.transaction.index')
-                ->with('error', 'Transaksi tidak ditemukan.');
-        }
-
-        // paymentSuccess hanya menerima redirect dari Pakasir.
-        // Pastikan pembayaran sudah dikonfirmasi lewat webhook.
-        if ($transaction->status !== 'paid' && $transaction->status !== 'out') {
-            return redirect()->route('attendant.transaction.index')
-                ->with('error', 'Transaksi belum terkonfirmasi oleh webhook. Tunggu proses pembayaran selesai.');
-        }
-
-        // Status sudah paid, lanjut ke konfirmasi keluar
-        return redirect()->route('attendant.transaction')
-            ->with('success', 'Pembayaran QRIS sudah dikonfirmasi. Silakan konfirmasi keluar kendaraan.');
-    }
-
-    /**
-     * Handle redirect setelah pembayaran gagal dari Payment Gateway
-     */
-    public function paymentFailed(Request $request): RedirectResponse
-    {
-        $orderId = $request->get('order_id');
-
-        return redirect()->route('attendant.transaction.index')
-            ->with('error', 'Pembayaran gagal atau dibatalkan. Order ID: ' . ($orderId ?? 'Unknown'));
-    }
-
-    /**
-     * Controller message ketika pembayaran sudah terkonfirmasi (dipanggil JS pada show-receipt)
-     */
-    public function paymentConfirmed(Transaction $transaction): RedirectResponse
-    {
-        return redirect()->route('attendant.transaction.index')
-            ->with('success', 'Pembayaran sudah dikonfirmasi oleh sistem. Silakan lanjutkan proses keluar.');
-    }
 
     /**
      * Halaman pembayaran publika - dapat diakses tanpa login via QR code di tiket masuk
@@ -623,18 +530,49 @@ class TransactionController extends Controller
             abort(403, 'Transaksi sudah dalam status "' . $transaction->status . '". Hanya transaksi dengan status "in" yang bisa dibayar.');
         }
 
-        // Generate payment gateway URL (akan lock amount ke DB jika belum ada)
-        $paymentGatewayService = new PaymentGatewayService();
-        $paymentGatewayUrl = $paymentGatewayService->generatePaymentUrl($transaction);
-
-        // Refresh transaction untuk dapat amount terbaru yang sudah di-lock
         $transaction->refresh();
 
-        // Hitung durasi untuk ditampilkan (informasi saja, bukan untuk amount)
         $durationMinutes = $transaction->entry_time->diffInMinutes(now());
         $hours = intdiv($durationMinutes, 60);
         $minutes = $durationMinutes % 60;
 
-        return view('public.payment', compact('transaction', 'paymentGatewayUrl', 'hours', 'minutes'));
+        return view('public.payment', compact('transaction', 'hours', 'minutes'));
+    }
+
+    public function publicProcessPayment(Request $request, Transaction $transaction): RedirectResponse
+    {
+        if ($transaction->status !== 'in') {
+            return redirect()->route('payment.public', $transaction->id)
+                ->with('error', 'Transaksi sudah tidak bisa dibayar (status: ' . $transaction->status . ').');
+        }
+
+        $paymentInfo = $transaction->calculatePayment();
+        $validated = $request->validate([
+            'paid_amount' => 'required|numeric|min:' . $paymentInfo['amount'],
+        ]);
+
+        try {
+            DB::transaction(function () use ($transaction, $validated) {
+                $transaction->processPayment((float) $validated['paid_amount']);
+                $transaction->processExit(now());
+                $transaction->area->updateOccupancy();
+
+                LogActivity::create([
+                    'transaction_id' => $transaction->id,
+                    'vehicle_id' => $transaction->vehicle_id,
+                    'user_id' => Auth::check() ? Auth::id() : null,
+                    'activity' => 'payment_exit',
+                    'plate_number' => $transaction->plate_number,
+                    'vehicle_color' => $transaction->vehicle_color,
+                    'description' => 'Pembayaran publik selesai, langsung keluar. Total Rp ' . number_format((float)$transaction->amount, 2),
+                ]);
+            });
+
+            return redirect()->route('transaction.scan-ticket', $transaction->id)
+                ->with('success', 'Pembayaran berhasil dan kendaraan sudah bisa keluar.');
+        } catch (\Exception $e) {
+            return redirect()->route('payment.public', $transaction->id)
+                ->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+        }
     }
 }
