@@ -3,102 +3,111 @@
         Transaksi Parkir
     </x-slot>
 
-    <section class="pt-12 pb-6">
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-        <!-- ===================== KENDARAAN MASUK ===================== -->
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-
-                <!-- Header -->
-                <div class="flex items-center justify-between p-4">
-                    <h5 class="text-gray-800 font-semibold">Data Kendaraan Masuk</h5>
-                </div>
-
-                <!-- Action & Search -->
+            <div
+                class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
                 <div
-                    class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t">
-
-                    <div class="w-full md:w-1/2">
-                        <form class="flex items-center" action="{{ route('attendant.transaction.index') }}">
-                            <div class="relative w-full">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
-                                    </svg>
-                                </div>
-                                <input type="text" name="search" value="{{ request('search') }}"
-                                    placeholder="Cari kendaraan..."
-                                    class="bg-gray-50 border border-gray-300 text-sm rounded-l-lg block w-full pl-10 p-2">
-                            </div>
-                            <button type="submit" class="text-white bg-primary px-4 py-2 rounded-r-lg">
-                                Cari
-                            </button>
-                        </form>
+                    class="flex flex-col md:flex-row md:items-center justify-between p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
+                            <span
+                                class="flex w-3 h-3 bg-red-500 rounded-full mr-2 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
+                            Menunggu Pembayaran
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-wider font-semibold">Status: IN
+                            (Kendaraan Di Dalam)</p>
                     </div>
 
-                    <div class="flex gap-2">
+                    <div class="flex items-center gap-3">
+                        <form action="{{ route('attendant.transaction.index') }}" class="relative group">
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Cari plat nomor..."
+                                class="w-full md:w-64 pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-primary transition-all">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </form>
                         <a href="{{ route('attendant.transaction.scan') }}"
-                            class="flex items-center justify-center text-white bg-yellow-500 hover:bg-yellow-600 font-medium rounded-lg text-sm px-4 py-2">
+                            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
                             Scan QR
                         </a>
                         <a href="{{ route('attendant.transaction.create') }}"
-                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
-                            <svg class="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path clip-rule="evenodd" fill-rule="evenodd"
-                                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-                            </svg>
-                            Tambah Transaksi
+                            class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all">
+                            + Baru
                         </a>
                     </div>
                 </div>
 
-                @if ($activeTransactions->count())
+                @if ($pendingPaymentTransactions->count())
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-xs uppercase bg-gray-50">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead
+                                class="bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 uppercase text-[11px] font-bold tracking-wider">
                                 <tr>
-                                    <th class="p-4">ID</th>
-                                    <th class="p-4">Plat</th>
-                                    <th class="p-4">Warna</th>
-                                    <th class="p-4">Area</th>
-                                    <th class="p-4">Status</th>
-                                    <th class="p-4">Masuk</th>
-                                    <th class="p-4">Durasi</th>
-                                    <th class="p-4">Aksi</th>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4">Plat Nomor</th>
+                                    <th class="px-6 py-4">Info Kendaraan</th>
+                                    <th class="px-6 py-4">Waktu Masuk</th>
+                                    <th class="px-6 py-4 text-center">Durasi</th>
+                                    <th class="px-6 py-4 text-right">Est. Bayar</th>
+                                    <th class="px-6 py-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($activeTransactions as $transaction)
-                                    @php
-                                        $minutes = $transaction->entry_time->diffInMinutes(now());
-                                        $hours = intdiv($minutes, 60);
-                                        $remain = $minutes % 60;
-                                    @endphp
-                                    <tr class="border-b hover:bg-gray-100">
-                                        <td class="px-4 py-3 font-medium">{{ $transaction->id }}</td>
-                                        <td class="px-4 py-3">{{ $transaction->plate_number }}</td>
-                                        <td class="px-4 py-3">{{ $transaction->vehicle_color }}</td>
-                                        <td class="px-4 py-3">{{ $transaction->area->name ?? '-' }}</td>
-                                        <td class="px-4 py-3">
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                @foreach ($pendingPaymentTransactions as $transaction)
+                                    @php $paymentInfo = $transaction->calculatePayment(); @endphp
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
+                                        <td class="px-6 py-4 font-medium text-gray-400 italic">#{{ $transaction->id }}
+                                        </td>
+                                        <td class="px-6 py-4">
                                             <span
-                                                class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
-                                                {{ strtoupper($transaction->status) }}
+                                                class="px-3 py-1.5 bg-gray-800 text-white dark:bg-gray-100 dark:text-gray-900 font-mono font-black rounded border-2 border-gray-700 text-base shadow-sm">
+                                                {{ $transaction->plate_number }}
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3 text-nowrap">{{ $transaction->entry_time }}</td>
-                                        <td class="px-4 py-3">{{ $hours }}j {{ $remain }}m</td>
-                                        <td class="px-4 py-3 flex gap-2">
-                                            <a href="{{ route('attendant.transaction.entry-receipt', $transaction->id) }}"
-                                                target="_blank"
-                                                class="px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/75">
-                                                Struk
-                                            </a>
-                                            <a href="{{ route('attendant.transaction.exit', $transaction->id) }}"
-                                                class="px-3 py-2 text-sm font-medium text-red-700 border border-red-700 rounded-lg hover:bg-red-700 hover:text-white">
-                                                Keluar
-                                            </a>
+                                        <td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+                                            <div class="font-semibold">{{ $transaction->area->name ?? '-' }}</div>
+                                            <div class="text-[11px] opacity-70">{{ $transaction->vehicle_color }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 font-medium">{{ $transaction->entry_time->format('H:i') }}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 text-center font-mono font-bold text-primary dark:text-blue-400">
+                                            {{ $paymentInfo['hours'] }}j {{ $paymentInfo['duration_minutes'] % 60 }}m
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <span class="text-red-600 dark:text-red-400 font-black text-base">
+                                                Rp{{ number_format($paymentInfo['amount'], 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <a href="{{ route('attendant.transaction.entry-receipt', $transaction->id) }}"
+                                                    target="_blank"
+                                                    class="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                    title="Print Struk Masuk">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                    </svg>
+                                                </a>
+                                                <a href="{{ route('attendant.transaction.receipt', $transaction->id) }}"
+                                                    class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md transition-all uppercase">
+                                                    Bayar
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -106,82 +115,153 @@
                         </table>
                     </div>
                 @else
-                    <p class="m-4 text-gray-500">Tidak ada kendaraan di dalam.</p>
+                    <div class="p-10 text-center text-gray-400 italic">Antrean kosong. Belum ada kendaraan masuk.</div>
                 @endif
             </div>
-        </div>
 
-        <!-- ===================== KENDARAAN KELUAR ===================== -->
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-6">
-            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
-
-                <div class="p-4">
-                    <h5 class="text-gray-800 font-semibold">Data Kendaraan Keluar</h5>
+            <div
+                class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div class="p-5 border-b border-gray-100 dark:border-gray-700">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
+                        <span
+                            class="flex w-3 h-3 bg-amber-500 rounded-full mr-2 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                        Sudah Bayar - Siap Keluar
+                    </h2>
                 </div>
 
+                @if ($paidTransactions->count())
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead
+                                class="bg-amber-50/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 uppercase text-[11px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4">Plat Nomor</th>
+                                    <th class="px-6 py-4">Info</th>
+                                    <th class="px-6 py-4 text-right">Pembayaran</th>
+                                    <th class="px-6 py-4 text-right text-green-600">Kembalian</th>
+                                    <th class="px-6 py-4 text-center">Aksi Verifikasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                @foreach ($paidTransactions as $transaction)
+                                    @php
+                                        $totalSeconds = $transaction->paid_at
+                                            ? $transaction->paid_at->diffInSeconds(now())
+                                            : 0;
+
+                                        $displayMinutes = floor($totalSeconds / 60);
+                                        $displaySeconds = $totalSeconds % 60;
+
+                                        $isNearExpiry = $displayMinutes > 50;
+                                    @endphp
+                                    <tr
+                                        class="hover:bg-amber-50/30 dark:hover:bg-amber-900/10 @if ($isNearExpiry) bg-red-50 dark:bg-red-900/10 @endif">
+                                        <td class="px-6 py-4 italic text-gray-400">#{{ $transaction->id }}</td>
+                                        <td
+                                            class="px-6 py-4 uppercase font-black text-gray-800 dark:text-white font-mono text-base">
+                                            {{ $transaction->plate_number }}
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-500 text-[12px]">
+                                            {{ $transaction->area->name ?? '-' }} | {{ $transaction->vehicle_color }}
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-bold italic">
+                                            Rp{{ number_format($transaction->paid_amount, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-6 py-4 text-right font-black text-green-600">
+                                            Rp{{ number_format($transaction->change, 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center justify-center gap-3">
+                                                @if ($isNearExpiry)
+                                                    <span
+                                                        class="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold rounded animate-pulse">
+                                                        ⚠️ {{ 60 - $displayMinutes }} Menit {{ 60 - $displaySeconds }} Detik
+                                                        tersisa
+                                                    </span>
+                                                @endif
+                                                <form
+                                                    action="{{ route('attendant.transaction.exit-vehicle.process', $transaction->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-black text-xs uppercase tracking-tight shadow-sm transition-all">
+                                                        Konfirmasi Keluar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="p-10 text-center text-gray-400 italic font-medium">Semua gate aman. Tidak ada antrean
+                        keluar.</div>
+                @endif
+            </div>
+
+            <div
+                class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 opacity-90 hover:opacity-100 transition-opacity">
+                <div class="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                    <h2 class="text-lg font-bold text-gray-600 dark:text-gray-300 flex items-center italic">
+                        <span class="flex w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>
+                        History Keluar Hari Ini
+                    </h2>
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-xs uppercase bg-gray-50">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-gray-50 dark:bg-gray-700/30 text-gray-400 uppercase font-black">
                             <tr>
-                                <th class="p-4">ID</th>
-                                <th class="p-4">Plat</th>
-                                <th class="p-4">Warna</th>
-                                <th class="p-4">Area</th>
-                                <th class="p-4">Masuk</th>
-                                <th class="p-4">Keluar</th>
-                                <th class="p-4">Durasi</th>
-                                <th class="p-4">Tarif/Jam</th>
-                                <th class="p-4">Total</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4">Struk</th>
+                                <th class="px-6 py-3 italic">ID</th>
+                                <th class="px-6 py-3">Plat</th>
+                                <th class="px-6 py-3">Masuk</th>
+                                <th class="px-6 py-3">Keluar</th>
+                                <th class="px-6 py-3">Durasi</th>
+                                <th class="px-6 py-3 text-right">Total Biaya</th>
+                                <th class="px-6 py-3 text-center">Struk</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
                             @forelse ($completedTransactions as $transaction)
-                                @php
-                                    $rate = $transaction->rate->amount;
-                                    $hours = ceil($transaction->duration_minutes / 60);
-                                @endphp
-                                <tr class="border-b hover:bg-gray-100">
-                                    <td class="px-4 py-3 font-medium">{{ $transaction->id }}</td>
-                                    <td class="px-4 py-3">{{ $transaction->plate_number }}</td>
-                                    <td class="px-4 py-3">{{ $transaction->vehicle_color }}</td>
-                                    <td class="px-4 py-3">{{ $transaction->area->name ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-nowrap">{{ $transaction->entry_time }}</td>
-                                    <td class="px-4 py-3">{{ $transaction->exit_time->format('H:i') }}</td>
-                                    <td class="px-4 py-3">{{ $transaction->duration_minutes }} m
-                                        ({{ $hours }}j)</td>
-                                    <td class="px-4 py-3">Rp {{ number_format($rate, 0, ',', '.') }}</td>
-                                    <td class="px-4 py-3">Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                                @php $hours = ceil($transaction->duration_minutes / 60); @endphp
+                                <tr
+                                    class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/20">
+                                    <td class="px-6 py-3">#{{ $transaction->id }}</td>
+                                    <td
+                                        class="px-6 py-3 font-bold text-gray-700 dark:text-gray-200 uppercase font-mono">
+                                        {{ $transaction->plate_number }}
                                     </td>
-                                    <td class="px-4 py-3">
-                                        <span
-                                            class="px-2 py-1 rounded text-xs font-semibold
-                                            {{ $transaction->status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }}">
-                                            {{ strtoupper($transaction->status) }}
-                                        </span>
+                                    <td class="px-6 py-3">{{ $transaction->entry_time->format('H:i') }}</td>
+                                    <td class="px-6 py-3 font-bold">{{ $transaction->exit_time->format('H:i') }}</td>
+                                    <td class="px-6 py-3 italic">{{ $hours }} jam</td>
+                                    <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200">
+                                        Rp{{ number_format($transaction->amount, 0, ',', '.') }}
                                     </td>
-                                    <td class="px-4 py-3 flex gap-1">
-                                        <a href="{{ route('attendant.transaction.entry-receipt', $transaction->id) }}"
-                                            target="_blank" class="text-blue-600 font-semibold text-sm">Masuk</a>
-                                        <span>|</span>
-                                        <a href="{{ route('attendant.transaction.receipt', $transaction->id) }}"
-                                            target="_blank" class="text-red-600 font-semibold text-sm">Keluar</a>
+                                    <td class="px-6 py-3 text-center">
+                                        <div class="flex justify-center gap-2 font-bold uppercase text-[10px]">
+                                            <a href="{{ route('attendant.transaction.entry-receipt', $transaction->id) }}"
+                                                target="_blank" class="text-primary hover:underline">Masuk</a>
+                                            <span class="text-gray-300">|</span>
+                                            <a href="{{ route('attendant.transaction.receipt-pdf', $transaction->id) }}"
+                                                target="_blank" class="text-emerald-500 hover:underline">Keluar</a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="px-4 py-6 text-center text-gray-500">
-                                        Tidak ada kendaraan keluar
+                                    <td colspan="7"
+                                        class="px-6 py-8 text-center opacity-50 font-bold tracking-widest uppercase text-xs">
+                                        Belum Ada Data Selesai
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-
             </div>
-        </div>
 
-    </section>
+        </div>
+    </div>
 </x-app-layout>

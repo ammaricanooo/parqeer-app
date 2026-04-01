@@ -153,7 +153,9 @@
             <img src="{{ $qrCodeUrl }}" alt="QR Code">
         </div>
         <div class="qr-text">SIMPAN TIKET INI</div>
-        <div class="qr-hint">Scan pada gate keluar untuk membayar</div>
+        <div class="qr-hint">
+            Scan pada gate pembayaran
+        </div>
     </div>
 
     <div class="footer">

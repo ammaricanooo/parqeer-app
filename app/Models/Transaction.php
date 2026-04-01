@@ -27,11 +27,16 @@ class Transaction extends Model
         'status',
         'paid_amount',
         'change',
+        'order_id',
+        'payment_method',
+        'payment_data',
+        'paid_at',
     ];
 
     protected $casts = [
         'entry_time' => 'datetime',
         'exit_time' => 'datetime',
+        'paid_at' => 'datetime',
         'amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'change' => 'decimal:2',
@@ -80,23 +85,75 @@ class Transaction extends Model
     }
 
     /**
-     * Hitung durasi dan amount per jam saat vehicle keluar
+     * Hitung pembayaran berdasarkan durasi sejak entry hingga sekarang
+     * Dipanggil saat kendaraan mau keluar dan akan membayar
+     */
+    public function calculatePayment(Carbon $paymentTime = null): array
+    {
+        $paymentTime = $paymentTime ?? Carbon::now();
+
+        // Pastikan rate relationship dimuat
+        if (!$this->relationLoaded('rate')) {
+            $this->load('rate');
+        }
+
+        // Hitung durasi dalam menit
+        $duration = $this->entry_time->diffInMinutes($paymentTime);
+
+        // Hitung amount berdasarkan rate (per jam)
+        // Minimal 1 jam untuk semua transaksi
+        $hours = max(1, ceil($duration / 60));
+        $rateAmount = $this->rate ? $this->rate->amount : 0;
+        $amount = $rateAmount * $hours;
+
+        return [
+            'duration_minutes' => $duration,
+            'hours' => $hours,
+            'amount' => $amount,
+        ];
+    }
+
+    /**
+     * Process pembayaran: hitung durasi & amount, set status dari 'in' -> 'paid'
+     */
+    public function processPayment(float $paidAmount, Carbon $paymentTime = null, string $paymentMethod = 'cash', array $paymentData = null): void
+    {
+        $paymentTime = $paymentTime ?? Carbon::now();
+
+        if ($this->status !== 'in') {
+            throw new \Exception('Transaksi harus status "in" untuk diproses pembayaran. Status saat ini: ' . $this->status);
+        }
+
+        // Hitung durasi dan amount
+        $paymentDataInternal = $this->calculatePayment($paymentTime);
+
+        // Update transaction dengan payment info
+        $this->duration_minutes = $paymentDataInternal['duration_minutes'];
+        $this->amount = $paymentDataInternal['amount'];
+        $this->paid_amount = $paidAmount;
+        $this->change = $paidAmount - $this->amount;
+        $this->status = 'paid';
+        $this->payment_method = $paymentMethod;
+        $this->paid_at = $paymentTime; // Track kapan pembayaran dilakukan
+
+        if ($paymentData) {
+            $this->payment_data = json_encode($paymentData);
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Process exit: set exit_time dan status dari 'paid' -> 'out'
      */
     public function processExit(Carbon $exitTime): void
     {
+        if ($this->status !== 'paid') {
+            throw new \Exception('Transaksi harus sudah dibayar (status "paid") untuk bisa keluar. Status saat ini: ' . $this->status);
+        }
+
         $this->exit_time = $exitTime;
-        
-        // Hitung durasi dalam menit
-        $duration = $this->entry_time->diffInMinutes($this->exit_time);
-        $this->duration_minutes = $duration;
-
-        // Hitung amount berdasarkan rate (per jam)
-        // Jika kurang dari 1 jam, tetap dihitung 1 jam
-        $hours = ceil($duration / 60);
-        $amount = ($this->rate->amount ?? 0) * $hours;
-        $this->amount = $amount;
         $this->status = 'out';
-
         $this->save();
     }
 
@@ -155,5 +212,40 @@ class Transaction extends Model
     public function isPaid(): bool
     {
         return $this->status === 'paid';
+    }
+
+    /**
+     * Check apakah pembayaran sudah expired (lebih dari 1 jam dan belum keluar)
+     * Pembayaran valid hanya untuk 1 jam - jika belum keluar, harus bayar ulang
+     */
+    public function isPaymentExpired(): bool
+    {
+        // Hanya applicable untuk transaksi yang sudah dibayar tapi belum keluar
+        if ($this->status !== 'paid' || !$this->paid_at) {
+            return false;
+        }
+
+        // Cek apakah sudah 1 jam dari paid_at
+        $oneHourPassed = $this->paid_at->addHours(1)->isPast();
+
+        return $oneHourPassed;
+    }
+
+    /**
+     * Reset pembayaran - ubah status dari 'paid' kembali ke 'in' jika sudah expired
+     * User harus bayar ulang untuk durasi sisanya
+     */
+    public function resetExpiredPayment(): void
+    {
+        if (!$this->isPaymentExpired()) {
+            return; // Tidak perlu di-reset
+        }
+
+        // Reset ke status 'in' agar bisa bayar ulang
+        $this->status = 'in';
+        $this->paid_at = null;
+        $this->paid_amount = null;
+        $this->change = null;
+        $this->save();
     }
 }

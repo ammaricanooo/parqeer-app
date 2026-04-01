@@ -10,7 +10,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
-                <div class="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-blue-600 to-blue-700 p-6 rounded-2xl shadow-xl shadow-blue-200 dark:shadow-none transition-transform hover:-translate-y-1">
+                <div class="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-700 p-6 rounded-2xl shadow-xl shadow-blue-200 dark:shadow-none transition-transform hover:-translate-y-1">
                     <div class="relative z-10 text-white">
                         <p class="text-sm font-medium opacity-80 uppercase tracking-widest">Hari Ini</p>
                         <p class="text-2xl font-extrabold mt-2">Rp {{ number_format($todayRevenue ?? 0,0,',','.') }}</p>
@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden bg-gradient-to-br from-emerald-400 via-teal-500 to-teal-600 p-6 rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-none transition-transform hover:-translate-y-1">
+                <div class="relative overflow-hidden bg-gradient-to-br from-teal-400 to-green-600 p-6 rounded-2xl shadow-xl shadow-teal-200 dark:shadow-none transition-transform hover:-translate-y-1">
                     <div class="relative z-10 text-white">
                         <p class="text-sm font-medium opacity-80 uppercase tracking-widest">Bulan Ini</p>
                         <p class="text-2xl font-extrabold mt-2">Rp {{ number_format($monthRevenue ?? 0,0,',','.') }}</p>
@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 p-6 rounded-2xl shadow-xl shadow-orange-200 dark:shadow-none transition-transform hover:-translate-y-1">
+                <div class="relative overflow-hidden bg-gradient-to-br from-yellow-400 to-amber-600 p-6 rounded-2xl shadow-xl shadow-yellow-200 dark:shadow-none transition-transform hover:-translate-y-1">
                     <div class="relative z-10 text-white">
                         <p class="text-sm font-medium opacity-80 uppercase tracking-widest">Sedang Parkir</p>
                         <p class="text-2xl font-extrabold mt-2">{{ number_format($currentlyParked ?? 0,0,',','.') }} <span class="text-sm font-normal">Kendaraan</span></p>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700 p-6 rounded-2xl shadow-xl shadow-purple-200 dark:shadow-none transition-transform hover:-translate-y-1">
+                <div class="relative overflow-hidden bg-gradient-to-br from-red-500 to-rose-700 p-6 rounded-2xl shadow-xl shadow-red-200 dark:shadow-none transition-transform hover:-translate-y-1">
                     <div class="relative z-10 text-white">
                         <p class="text-sm font-medium opacity-80 uppercase tracking-widest">Total Pendapatan</p>
                         <p class="text-2xl font-extrabold mt-2">Rp {{ number_format($totalRevenue ?? 0,0,',','.') }}</p>

@@ -31,10 +31,14 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
     Route::post('/transaction', [TransactionController::class, 'store'])->name('transaction.store');
     Route::get('/transaction/{transaction}/exit', [TransactionController::class, 'showExit'])->name('transaction.exit');
     Route::post('/transaction/{transaction}/exit', [TransactionController::class, 'processExit'])->name('transaction.exit.process');
+    Route::get('/transaction/{transaction}/exit-vehicle', [TransactionController::class, 'showExitVehicle'])->name('transaction.exit-vehicle');
+    Route::post('/transaction/{transaction}/exit-vehicle', [TransactionController::class, 'exitVehicle'])->name('transaction.exit-vehicle.process');
     Route::get('/transaction/{transaction}/receipt', [TransactionController::class, 'receipt'])->name('transaction.receipt');
+    Route::get('/transaction/{transaction}/receipt-pdf', [TransactionController::class, 'downloadExitReceipt'])->name('transaction.receipt-pdf');
     Route::get('/transaction/{transaction}/receipt-pdf', [TransactionController::class, 'downloadExitReceipt'])->name('transaction.receipt-pdf');
     Route::post('/transaction/{transaction}/pay', [TransactionController::class, 'pay'])->name('transaction.pay');
     Route::get('/transaction/{transaction}/payment-receipt', [TransactionController::class, 'downloadPaymentReceipt'])->name('transaction.payment-receipt');
+
     Route::get('/transaction/search/vehicle', [TransactionController::class, 'searchVehicle'])->name('transaction.search-vehicle');
     Route::get('/transaction/get-rate', [TransactionController::class, 'getRate'])->name('transaction.get-rate');
     Route::get('/transaction/{transaction}/current-amount', [TransactionController::class, 'currentAmount'])->middleware(['auth', 'verified'])->name('transaction.current-amount');
@@ -51,6 +55,18 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
     Route::put('/vehicle/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
     Route::delete('/vehicle/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 });
+
+// Payment Gateway routes
+Route::post('/attendant/payment/callback', [TransactionController::class, 'handlePaymentCallback'])->name('payment.callback');
+Route::get('/attendant/payment/success', [TransactionController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/attendant/payment/failed', [TransactionController::class, 'paymentFailed'])->name('payment.failed');
+Route::get('/attendant/transaction/{transaction}/payment-confirmed', [TransactionController::class, 'paymentConfirmed'])->name('attendant.transaction.payment-confirmed');
+
+// Public gate scan ticket (dapat diakses tanpa login)
+Route::get('/transaction/{transaction}/scan-ticket', [TransactionController::class, 'scanTicket'])->name('transaction.scan-ticket');
+
+// Public payment page (dapat diakses tanpa login - untuk scan QR dari tiket)
+Route::get('/payment/{transaction}', [TransactionController::class, 'publicPayment'])->name('payment.public');
 
 // Dashboard admin (rekap cepat untuk admin)
 // Dashboard admin (summary + area table + top transactions)

@@ -85,11 +85,13 @@ class TicketService
     /**
      * GENERATE QR CODE (FORMAT SVG BASE64)
      * Tidak butuh Imagick atau GD extension
+     * Entry ticket QR selalu mengarah ke halaman pembayaran (fixed, tidak berubah)
      */
     private function generateQrCodeBase64(Transaction $transaction): string
     {
-        // URL yang akan diarahkan saat scan keluar
-        $url = route('attendant.transaction.exit', $transaction->id);
+        // Entry ticket QR harus tetap satu URL (scan gate)
+        // Saat scan gate, akan otomatis cek status: bayar / keluar
+        $url = route('transaction.scan-ticket', $transaction->id);
 
         $svg = QrCode::format('svg')
             ->size(200)

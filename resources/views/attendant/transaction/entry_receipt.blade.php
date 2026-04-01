@@ -48,7 +48,7 @@
                     <div class="text-center">
                         <div id="qrcode" class="flex justify-center mb-4 p-2 bg-white rounded-lg inline-block mx-auto"></div>
                         <p class="text-[11px] font-bold uppercase tracking-tight">Simpan Struk Ini</p>
-                        <p class="text-[9px] text-gray-500 italic mt-1">Scan QR ini saat akan keluar area parkir</p>
+                        <p class="text-[9px] text-gray-500 italic mt-1">Scan QR ini saat akan membayar</p>
                     </div>
 
                     {{-- Footer Kecil --}}
@@ -79,9 +79,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Entry ticket QR selalu mengarah ke pembayaran publik
+            const qrUrl = '{{ route('payment.public', $transaction->id) }}';
+
             // Setup QR Code
             new QRCode(document.getElementById("qrcode"), {
-                text: '{{ route('attendant.transaction.exit', $transaction->id) }}',
+                text: qrUrl,
                 width: 140,
                 height: 140,
                 colorDark : "#000000",

@@ -137,10 +137,6 @@
             <td class="value">{{ $transaction->entry_time->format('d/m/y H:i') }}</td>
         </tr>
         <tr>
-            <td class="label">Waktu Keluar</td>
-            <td class="value">{{ $transaction->exit_time->format('d/m/y H:i') }}</td>
-        </tr>
-        <tr>
             <td class="label">Durasi</td>
             <td class="value">{{ $transaction->duration_minutes }} Menit</td>
         </tr>
@@ -151,11 +147,11 @@
     </table>
 
     <div class="total-box">
-        <div class="total-label">ESTIMASI BIAYA</div>
+        <div class="total-label">{{ $transaction->status === 'paid' || $transaction->status === 'out' ? 'TOTAL BIAYA' : 'ESTIMASI BIAYA' }}</div>
         <div class="total-amount">Rp{{ number_format($transaction->amount, 0, ',', '.') }}</div>
     </div>
 
-    @if($transaction->status === 'paid')
+    @if($transaction->status === 'paid' || $transaction->status === 'out')
         <div class="status-badge paid">
             SUDAH DIBAYAR / PAID
         </div>

@@ -32,14 +32,17 @@
                                 class="block mb-2 text-sm font-medium text-gray-900">
                                 Plat Nomor <span class="text-red-500">*</span>
                             </label>
-                            <input type="text"
-                                id="plate_number"
-                                name="plate_number"
-                                list="vehicle_suggestions"
-                                class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="Contoh: B 1234 XYZ"
-                                value="{{ old('plate_number') }}"
-                                required>
+                            <div class="relative">
+                                <input type="text"
+                                    id="plate_number"
+                                    name="plate_number"
+                                    list="vehicle_suggestions"
+                                    class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
+                                    placeholder="Contoh: B 1234 XYZ"
+                                    value="{{ old('plate_number') }}"
+                                    required>
+                                <span id="plate_loading" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-xs text-blue-600 font-semibold">Loading...</span>
+                            </div>
                             <datalist id="vehicle_suggestions"></datalist>
                             <x-input-error :messages="$errors->get('plate_number')" class="mt-2" />
                         </div>
@@ -134,7 +137,9 @@
     </section>
 
         <script>
-        // Auto-complete plat nomor
+        let debounceTimer;
+        
+        // Auto-complete plat nomor dari local database + API cek pajak
         const plateInput = document.getElementById('plate_number');
         const colorInput = document.getElementById('vehicle_color');
         const datalist = document.getElementById('vehicle_suggestions');
@@ -143,27 +148,75 @@
         const rateDisplay = document.getElementById('rate_display');
 
         plateInput.addEventListener('input', async function() {
-            const value = this.value;
+            // Clear previous timer
+            clearTimeout(debounceTimer);
+            
+            const value = this.value.trim();
             if (value.length < 2) {
                 datalist.innerHTML = '';
                 return;
             }
 
-            try {
-                const response = await fetch(`{{ route('attendant.transaction.search-vehicle') }}?q=${encodeURIComponent(value)}`);
-                const vehicles = await response.json();
-                
-                datalist.innerHTML = '';
-                vehicles.forEach(vehicle => {
-                    const option = document.createElement('option');
-                    option.value = vehicle.plate_number;
-                    option.textContent = `${vehicle.plate_number} (${vehicle.color})`;
-                    option.dataset.color = vehicle.color;
-                    datalist.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error fetching vehicles:', error);
-            }
+            // Debounce 500ms agar tidak spam request
+            debounceTimer = setTimeout(async () => {
+                const loadingIndicator = document.getElementById('plate_loading');
+                loadingIndicator.classList.remove('hidden');
+
+                try {
+                    // 1. Search dari local database terlebih dahulu
+                    const localResponse = await fetch(`{{ route('attendant.transaction.search-vehicle') }}?q=${encodeURIComponent(value)}`);
+                    const localVehicles = await localResponse.json();
+                    
+                    datalist.innerHTML = '';
+                    localVehicles.forEach(vehicle => {
+                        const option = document.createElement('option');
+                        option.value = vehicle.plate_number;
+                        option.textContent = `${vehicle.plate_number} (${vehicle.color})`;
+                        option.dataset.color = vehicle.color;
+                        datalist.appendChild(option);
+                    });
+
+                    // 2. Hubungi API cek pajak untuk mendapat informasi verifikasi
+                    const formattedPlate = value.toUpperCase().trim();
+                    const apiUrl = `https://api.ammaricano.my.id/api/tools/cek-pajak/jabar?plat=${encodeURIComponent(formattedPlate)}`;
+                    
+                    console.log('Calling API:', apiUrl);
+                    
+                    const apiResponse = await fetch(apiUrl);
+                    const apiData = await apiResponse.json();
+                    
+                    if (apiData.success && apiData.result && apiData.result['informasi-umum']) {
+                        const info = apiData.result['informasi-umum'];
+                        
+                        // Auto-fill warna jika kosong
+                        if (!colorInput.value || colorInput.value === old('vehicle_color')) {
+                            colorInput.value = info['warna'] || '';
+                        }
+                        
+                        // Tambah info ke tooltip atau hidden field untuk referensi
+                        console.log('Vehicle verified from API:', {
+                            merk: info['merk'],
+                            model: info['model'],
+                            warna: info['warna'],
+                            jenis: info['jenis'],
+                            tahun: info['tahun-buatan']
+                        });
+
+                        // Suggest area berdasarkan jenis kendaraan dari API
+                        const vehicleType = info['jenis']?.toLowerCase() || '';
+                        if (vehicleType.includes('roda 2') || vehicleType.includes('motor')) {
+                            // Suggest motor parking area (optional - atau autoselect jika hanya 1)
+                        } else if (vehicleType.includes('roda 4') || vehicleType.includes('mobil') || vehicleType.includes('minibus')) {
+                            // Suggest car parking area
+                        }
+                    }
+                } catch (error) {
+                    console.warn('API check failed (this is okay):', error.message);
+                    // Jika API error, tidak apa-apa - user bisa input manual
+                } finally {
+                    document.getElementById('plate_loading').classList.add('hidden');
+                }
+            }, 500);
         });
 
         // Update warna otomatis saat pilih dari datalist

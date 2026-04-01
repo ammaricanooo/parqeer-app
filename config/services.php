@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'pakasir' => [
+        'api_key' => env('PAKASIR_API_KEY'),
+        'slug' => env('PAKASIR_SLUG', 'parqeer-app'),
+        'webhook_secret' => env('PAKASIR_WEBHOOK_SECRET'),
+    ],
+
 ];

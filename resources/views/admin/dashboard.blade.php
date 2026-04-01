@@ -10,9 +10,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 
-                <div class="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                <div class="relative overflow-hidden bg-gradient-to-br from-purple-500 to-indigo-700 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
                     <div class="relative z-10">
-                        <p class="text-sm font-medium text-blue-100 uppercase tracking-wider">Jumlah Pengguna</p>
+                        <p class="text-sm font-medium text-purple-100 uppercase tracking-wider">Jumlah Pengguna</p>
                         <p class="text-3xl font-bold text-white mt-1">{{ number_format($userCount ?? 0) }}</p>
                     </div>
                     <div class="absolute right-[-10px] bottom-[-10px] text-white opacity-20">
@@ -22,9 +22,9 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-700 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                <div class="relative overflow-hidden bg-gradient-to-br from-green-500 to-cyan-700 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
                     <div class="relative z-10">
-                        <p class="text-sm font-medium text-emerald-100 uppercase tracking-wider">Jumlah Area</p>
+                        <p class="text-sm font-medium text-green-100 uppercase tracking-wider">Jumlah Area</p>
                         <p class="text-3xl font-bold text-white mt-1">{{ number_format($areaCount ?? 0) }}</p>
                     </div>
                     <div class="absolute right-[-10px] bottom-[-10px] text-white opacity-20">
@@ -35,9 +35,9 @@
                     </div>
                 </div>
 
-                <div class="relative overflow-hidden bg-gradient-to-br from-orange-400 to-red-600 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                <div class="relative overflow-hidden bg-gradient-to-br from-amber-400 to-yellow-600 p-6 rounded-2xl shadow-lg transition-transform hover:scale-105">
                     <div class="relative z-10">
-                        <p class="text-sm font-medium text-orange-100 uppercase tracking-wider">Jumlah Kendaraan</p>
+                        <p class="text-sm font-medium text-amber-100 uppercase tracking-wider">Jumlah Kendaraan</p>
                         <p class="text-3xl font-bold text-white mt-1">{{ number_format($carCount ?? 0) }}</p>
                     </div>
                     <div class="absolute right-[-10px] bottom-[-10px] text-white opacity-20">
@@ -60,7 +60,7 @@
                         @forelse($areasWithRates as $area)
                             <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
                                 <div class="flex items-center mb-3">
-                                    <div class="w-2 h-6 bg-blue-500 rounded-full mr-3"></div>
+                                    <div class="w-2 h-6 bg-purple-500 rounded-full mr-3"></div>
                                     <span class="font-bold text-gray-700 dark:text-gray-300 capitalize">{{ $area->name }}</span>
                                 </div>
                                 
@@ -71,7 +71,7 @@
                                         @foreach($area->rates as $rate)
                                             <div class="flex justify-between items-center text-sm p-2 bg-white dark:bg-gray-800 rounded shadow-sm">
                                                 <span class="text-gray-600 dark:text-gray-400 font-medium">{{ ucfirst($rate->vehicle_type) }}</span>
-                                                <span class="font-semibold text-blue-600 dark:text-blue-400">Rp {{ number_format($rate->amount, 0, ',', '.') }}</span>
+                                                <span class="font-semibold text-purple-600 dark:text-purple-400">Rp {{ number_format($rate->amount, 0, ',', '.') }}</span>
                                             </div>
                                         @endforeach
                                     @endif

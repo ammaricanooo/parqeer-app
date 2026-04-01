@@ -53,10 +53,6 @@
                 <span class="label">Masuk:</span>
                 <span class="value">{{ $transaction->entry_time->format('d/m/Y H:i') }}</span>
             </div>
-            <div class="receipt-row">
-                <span class="label">Keluar:</span>
-                <span class="value">{{ $transaction->exit_time->format('d/m/Y H:i') }}</span>
-            </div>
             <div class="divider"></div>
 
             <div class="receipt-row">
