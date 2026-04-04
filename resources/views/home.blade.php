@@ -174,10 +174,10 @@
                             <p class="text-xs font-medium uppercase tracking-widest text-primary-light">Admin &
                                 Operator Portal</p>
                         </div>
-                        <h1 class="font-bold text-5xl md:text-6xl leading-tight slide-up">
+                        <h1 class="font-bold text-3xl md:text-6xl leading-tight slide-up">
                             Selamat Datang di Parqeer Internal Management System
                         </h1>
-                        <p class="text-lg mt-6 leading-relaxed slide-up max-w-2xl opacity-80">
+                        <p class="md:text-lg mt-6 leading-relaxed slide-up max-w-2xl opacity-80">
                             Sistem ini dirancang untuk memudahkan Petugas
                             dalam validasi, Owner dalam pemantauan profit, dan Admin dalam konfigurasi sistem parkir
                             digital.

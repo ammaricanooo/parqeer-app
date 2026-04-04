@@ -56,12 +56,6 @@
                         Reset
                     </a>
 
-                    <a href="{{ route('owner.laporan.export') }}?mode={{ $mode }}&from={{ $from }}&to={{ $to }}" class="inline-flex items-center px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-100 dark:shadow-none ml-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Export Excel
-                    </a>
                 </div>
             </form>
         </div>
@@ -102,6 +96,83 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
+            </div>
+        </div>
+
+        {{-- ================= AREA OCCUPANCY INDICATOR ================= --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">Status Area Parkir</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse ($areaOccupancy as $area)
+                    <div class="relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 transition-all hover:shadow-lg {{ $area['status'] === 'full' ? 'ring-2 ring-red-500' : ($area['status'] === 'warning' ? 'ring-2 ring-yellow-500' : '') }}">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-gray-800 dark:text-gray-200">{{ $area['name'] }}</h4>
+                            <div class="flex items-center">
+                                @if($area['status'] === 'full')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Penuh
+                                    </span>
+                                @elseif($area['status'] === 'warning')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Hampir Penuh
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Tersedia
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">Terisi</span>
+                                <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $area['occupied'] }} / {{ $area['capacity'] }}</span>
+                            </div>
+
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div class="h-3 rounded-full transition-all duration-300 {{ $area['status'] === 'full' ? 'bg-red-500' : ($area['status'] === 'warning' ? 'bg-yellow-500' : 'bg-green-500') }}" style="width: {{ min($area['percentage'], 100) }}%"></div>
+                            </div>
+
+                            <div class="text-center">
+                                <span class="text-2xl font-black {{ $area['status'] === 'full' ? 'text-red-600' : ($area['status'] === 'warning' ? 'text-yellow-600' : 'text-green-600') }}">{{ $area['percentage'] }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full text-center py-12">
+                        <img src="https://illustrations.popsy.co/gray/box.svg" class="w-24 h-24 mx-auto mb-4 opacity-50">
+                        <p class="text-gray-400 italic">Tidak ada area parkir yang dikonfigurasi</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- ================= CHART ================= --}}
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-200">Grafik Pendapatan Harian</h3>
+                <span class="text-xs text-gray-500">Mode: {{ ucfirst($mode) }}</span>
+            </div>
+            <div>
+                <canvas id="revenueChart" height="120"></canvas>
             </div>
         </div>
 
@@ -186,6 +257,55 @@
         if (modeSelect) { 
             modeSelect.addEventListener('change', toggleDateInput); 
             toggleDateInput(); 
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartCtx = document.getElementById('revenueChart');
+
+        if (chartCtx) {
+            const labels = @json($dailyData->pluck('date'));
+            const totals = @json($dailyData->pluck('total'));
+
+            new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Pendapatan (Rp)',
+                        data: totals,
+                        borderColor: 'rgba(37, 99, 235, 0.9)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        fill: true,
+                        tension: 0.3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value){
+                                    return 'Rp ' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Pendapatan: Rp ' + Number(context.raw).toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </x-app-layout>

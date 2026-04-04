@@ -97,6 +97,24 @@ class AreaController extends Controller
      */
     public function destroy(Area $area)
     {
+        // Cek apakah masih ada transaksi aktif (kendaraan yang sedang parkir)
+        $activeTransactions = $area->transactions()->where('status', 'in')->count();
+
+        if ($activeTransactions > 0) {
+            return redirect()
+                ->route('admin.areas.index')
+                ->with('error', "Area '{$area->name}' tidak dapat dihapus karena masih ada {$activeTransactions} kendaraan yang sedang parkir!");
+        }
+
+        // Cek apakah masih ada transaksi historis
+        $totalTransactions = $area->transactions()->count();
+
+        if ($totalTransactions > 0) {
+            return redirect()
+                ->route('admin.areas.index')
+                ->with('error', "Area '{$area->name}' tidak dapat dihapus karena masih memiliki {$totalTransactions} data transaksi historis. Data ini diperlukan untuk laporan dan audit.");
+        }
+
         $area->delete();
 
         return redirect()

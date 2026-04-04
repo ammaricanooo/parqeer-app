@@ -129,7 +129,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
                         </div>
                     </div>
                     <!-- ====== Forms Section End -->
-                    <p class="text-center">2026 Ammar Abdul Malik - XII RPL SMK BINA INFORATIKA</p>
+                    <p class="text-center text-xs text-gray-400 mt-10">© 2026 Ammar Abdul Malik - XII RPL <br>SMK BINA INFORMATIKA</p>
                 </div>
             </main>
             <!-- ===== Main Content End ===== -->

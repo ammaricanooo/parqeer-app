@@ -33,14 +33,6 @@
                                 </svg>
                             </div>
                         </form>
-                        <a href="{{ route('attendant.transaction.scan') }}"
-                            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                            </svg>
-                            Scan QR
-                        </a>
                         <a href="{{ route('attendant.transaction.create') }}"
                             class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all">
                             + Baru
@@ -103,9 +95,9 @@
                                                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                     </svg>
                                                 </a>
-                                                <a href="{{ route('attendant.transaction.receipt', $transaction->id) }}"
+                                                <a href="{{ route('attendant.transaction.scan-ticket', $transaction->id) }}"
                                                     class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md transition-all uppercase">
-                                                    Bayar
+                                                    Bayar & Keluar
                                                 </a>
                                             </div>
                                         </td>
@@ -116,89 +108,6 @@
                     </div>
                 @else
                     <div class="p-10 text-center text-gray-400 italic">Antrean kosong. Belum ada kendaraan masuk.</div>
-                @endif
-            </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 shadow-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                <div class="p-5 border-b border-gray-100 dark:border-gray-700">
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-                        <span
-                            class="flex w-3 h-3 bg-amber-500 rounded-full mr-2 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                        Sudah Bayar - Siap Keluar
-                    </h2>
-                </div>
-
-                @if ($paidTransactions->count())
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead
-                                class="bg-amber-50/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 uppercase text-[11px] font-bold">
-                                <tr>
-                                    <th class="px-6 py-4">ID</th>
-                                    <th class="px-6 py-4">Plat Nomor</th>
-                                    <th class="px-6 py-4">Info</th>
-                                    <th class="px-6 py-4 text-right">Pembayaran</th>
-                                    <th class="px-6 py-4 text-right text-green-600">Kembalian</th>
-                                    <th class="px-6 py-4 text-center">Aksi Verifikasi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                                @foreach ($paidTransactions as $transaction)
-                                    @php
-                                        $totalSeconds = $transaction->paid_at
-                                            ? $transaction->paid_at->diffInSeconds(now())
-                                            : 0;
-
-                                        $displayMinutes = floor($totalSeconds / 60);
-                                        $displaySeconds = $totalSeconds % 60;
-
-                                        $isNearExpiry = $displayMinutes > 50;
-                                    @endphp
-                                    <tr
-                                        class="hover:bg-amber-50/30 dark:hover:bg-amber-900/10 @if ($isNearExpiry) bg-red-50 dark:bg-red-900/10 @endif">
-                                        <td class="px-6 py-4 italic text-gray-400">#{{ $transaction->id }}</td>
-                                        <td
-                                            class="px-6 py-4 uppercase font-black text-gray-800 dark:text-white font-mono text-base">
-                                            {{ $transaction->plate_number }}
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-500 text-[12px]">
-                                            {{ $transaction->area->name ?? '-' }} | {{ $transaction->vehicle_color }}
-                                        </td>
-                                        <td class="px-6 py-4 text-right font-bold italic">
-                                            Rp{{ number_format($transaction->paid_amount, 0, ',', '.') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-right font-black text-green-600">
-                                            Rp{{ number_format($transaction->change, 0, ',', '.') }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center justify-center gap-3">
-                                                @if ($isNearExpiry)
-                                                    <span
-                                                        class="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold rounded animate-pulse">
-                                                        ⚠️ {{ 60 - $displayMinutes }} Menit {{ 60 - $displaySeconds }} Detik
-                                                        tersisa
-                                                    </span>
-                                                @endif
-                                                <form
-                                                    action="{{ route('attendant.transaction.exit-vehicle.process', $transaction->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-black text-xs uppercase tracking-tight shadow-sm transition-all">
-                                                        Konfirmasi Keluar
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="p-10 text-center text-gray-400 italic font-medium">Semua gate aman. Tidak ada antrean
-                        keluar.</div>
                 @endif
             </div>
 

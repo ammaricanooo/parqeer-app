@@ -10,8 +10,8 @@
 
 
     <section class="pt-12 pb-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white relative shadow-md sm:rounded-lg space-y-3 md:space-y-0 md:space-x-4 p-4">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="bg-white relative shadow-md rounded-lg space-y-3 md:space-y-0 md:space-x-4 p-4">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div class="flex-1 flex items-center px-4 py-2">
                         <h5>
@@ -59,7 +59,7 @@
                                     class="block mb-2 text-sm font-medium text-gray-900">Password</label>
                                 <input type="text" name="password" id="password"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    placeholder="Masukkan Password" required="" value="{{ old('password') }}">
+                                    placeholder="Masukkan Password" value="{{ old('password') }}">
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                             </div>
                             <div>

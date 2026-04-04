@@ -89,9 +89,8 @@ class TicketService
      */
     private function generateQrCodeBase64(Transaction $transaction): string
     {
-        // Entry ticket QR harus tetap satu URL (scan gate)
-        // Saat scan gate, akan otomatis cek status: bayar / keluar
-        $url = route('transaction.scan-ticket', $transaction->id);
+        // Entry ticket QR harus tetap satu URL (scan gate) untuk petugas
+        $url = route('attendant.transaction.scan-ticket', $transaction->id);
 
         $svg = QrCode::format('svg')
             ->size(200)

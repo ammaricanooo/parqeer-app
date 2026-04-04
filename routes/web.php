@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DebugController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\AreaController;
@@ -10,13 +9,15 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\LogActivityController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Transaction;
+use App\Models\Area;
+use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 Route::get('/', function () {
     return view('home');
 });
-
-// Debug route
-Route::get('/debug/test-user', [DebugController::class, 'testUser']);
 
 // Dashboard untuk attendant (default)
 Route::get('/dashboard', function () {
@@ -29,15 +30,10 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
     Route::get('/transaction', [TransactionController::class, 'index'])->name('transaction.index');
     Route::get('/transaction/create', [TransactionController::class, 'create'])->name('transaction.create');
     Route::post('/transaction', [TransactionController::class, 'store'])->name('transaction.store');
-    Route::get('/transaction/{transaction}/exit', [TransactionController::class, 'showExit'])->name('transaction.exit');
-    Route::post('/transaction/{transaction}/exit', [TransactionController::class, 'processExit'])->name('transaction.exit.process');
-    Route::get('/transaction/{transaction}/exit-vehicle', [TransactionController::class, 'showExitVehicle'])->name('transaction.exit-vehicle');
-    Route::post('/transaction/{transaction}/exit-vehicle', [TransactionController::class, 'exitVehicle'])->name('transaction.exit-vehicle.process');
+    /*
     Route::get('/transaction/{transaction}/receipt', [TransactionController::class, 'receipt'])->name('transaction.receipt');
+    */
     Route::get('/transaction/{transaction}/receipt-pdf', [TransactionController::class, 'downloadExitReceipt'])->name('transaction.receipt-pdf');
-    Route::get('/transaction/{transaction}/receipt-pdf', [TransactionController::class, 'downloadExitReceipt'])->name('transaction.receipt-pdf');
-    Route::post('/transaction/{transaction}/pay', [TransactionController::class, 'pay'])->name('transaction.pay');
-    Route::get('/transaction/{transaction}/payment-receipt', [TransactionController::class, 'downloadPaymentReceipt'])->name('transaction.payment-receipt');
 
     Route::get('/transaction/search/vehicle', [TransactionController::class, 'searchVehicle'])->name('transaction.search-vehicle');
     Route::get('/transaction/get-rate', [TransactionController::class, 'getRate'])->name('transaction.get-rate');
@@ -45,6 +41,8 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
 
     // Struk entry & QR
     Route::get('/transaction/{transaction}/entry-receipt', [TransactionController::class, 'entryReceipt'])->name('transaction.entry-receipt');
+    Route::get('/transaction/{transaction}/scan-ticket', [TransactionController::class, 'scanTicket'])->name('transaction.scan-ticket');
+    Route::post('/transaction/{transaction}/pay-and-exit', [TransactionController::class, 'payAndExit'])->name('transaction.pay-and-exit');
     Route::get('/transaction/scan', [TransactionController::class, 'scanQr'])->name('transaction.scan');
 
     // Vehicle routes - attendant bisa input kendaraan baru
@@ -56,17 +54,8 @@ Route::middleware(['auth', 'verified', 'role:attendant'])->prefix('attendant')->
     Route::delete('/vehicle/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 });
 
-// Payment Gateway routes
-Route::post('/attendant/payment/callback', [TransactionController::class, 'handlePaymentCallback'])->name('payment.callback');
-Route::get('/attendant/payment/success', [TransactionController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/attendant/payment/failed', [TransactionController::class, 'paymentFailed'])->name('payment.failed');
+// Payment confirmation route (attendant-only)
 Route::get('/attendant/transaction/{transaction}/payment-confirmed', [TransactionController::class, 'paymentConfirmed'])->name('attendant.transaction.payment-confirmed');
-
-// Public gate scan ticket (dapat diakses tanpa login)
-Route::get('/transaction/{transaction}/scan-ticket', [TransactionController::class, 'scanTicket'])->name('transaction.scan-ticket');
-
-// Public payment page (dapat diakses tanpa login - untuk scan QR dari tiket)
-Route::get('/payment/{transaction}', [TransactionController::class, 'publicPayment'])->name('payment.public');
 
 // Dashboard admin (rekap cepat untuk admin)
 // Dashboard admin (summary + area table + top transactions)
@@ -207,6 +196,19 @@ Route::get('/laporan', function (\Illuminate\Http\Request $request) {
             ->count();
     }
 
+    // Area occupancy - current parked vehicles per area
+    $areaOccupancy = \App\Models\Area::with('transactions')->get()->map(function ($area) {
+        $occupied = $area->transactions->where('status', 'in')->count();
+        $percentage = $area->capacity > 0 ? round(($occupied / $area->capacity) * 100, 1) : 0;
+        return [
+            'name' => $area->name,
+            'capacity' => $area->capacity,
+            'occupied' => $occupied,
+            'percentage' => $percentage,
+            'status' => $percentage >= 90 ? 'full' : ($percentage >= 70 ? 'warning' : 'available')
+        ];
+    });
+
     return view('owner.laporan', compact(
         'dailyTotal',
         'weeklyTotal',
@@ -219,7 +221,8 @@ Route::get('/laporan', function (\Illuminate\Http\Request $request) {
         'from',
         'to',
         'vehicleRecap',
-        'stillParked'
+        'stillParked',
+        'areaOccupancy'
     ));
 })->name('owner.laporan');
 Route::put('/admin/users/edit/{user:id}', [UserController::class, 'update'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.users.update');
@@ -244,10 +247,6 @@ Route::get('/admin/areas/export/excel', [AreaController::class, 'exportExcel'])-
 
 Route::get('/admin/vehicles', [VehicleController::class, 'adminIndex'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicles.index');
 Route::get('/admin/vehicles/{vehicle}', [VehicleController::class, 'adminShow'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicles.show');
-Route::get('/admin/transaction/{transaction}/entry-receipt', [TransactionController::class, 'entryReceipt'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.transaction.entry-receipt');
-Route::get('/admin/transaction/{transaction}/receipt', [TransactionController::class, 'receipt'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.transaction.receipt');
-
-Route::get('/admin/transaction/{transaction}/current-amount', [TransactionController::class, 'currentAmount'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.transaction.current-amount');
 
 Route::get('/admin/logs', [LogActivityController::class, 'index'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.logs.index');
 Route::get('/logs/{logActivity}', [LogActivityController::class, 'show'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.logs.show');
@@ -257,76 +256,141 @@ Route::middleware(['auth', 'verified', 'role:owner'])
     ->name('owner.')
     ->group(function () {
 
-        Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
-
-            // Simplified owner dashboard metrics (cards + revenue per area + top transactions)
-            $today = \Carbon\Carbon::today();
-
-            $todayRevenue = \App\Models\Transaction::whereNotNull('exit_time')
-                ->whereDate('exit_time', $today)
-                ->sum('amount');
-
-            $monthRevenue = \App\Models\Transaction::whereNotNull('exit_time')
-                ->whereBetween('exit_time', [$today->copy()->startOfMonth(), $today])
-                ->sum('amount');
-
-            $currentlyParked = \App\Models\Transaction::whereNull('exit_time')->count();
-
-            $totalRevenue = \App\Models\Transaction::whereNotNull('exit_time')->sum('amount');
-
-            $revenuePerArea = \App\Models\Transaction::whereNotNull('exit_time')
-                ->join('areas', 'transactions.area_id', '=', 'areas.id')
-                ->selectRaw('areas.name as area_name, SUM(transactions.amount) as total, COUNT(*) as tx_count')
-                ->groupBy('areas.name')
-                ->orderByDesc('total')
-                ->get();
-
-            $topTransactions = \App\Models\Transaction::whereNotNull('exit_time')
-                ->with('vehicle', 'area')
-                ->orderByDesc('amount')
-                ->take(3)
-                ->get();
-
-            return view('owner.dashboard', compact(
-                'todayRevenue',
-                'monthRevenue',
-                'currentlyParked',
-                'totalRevenue',
-                'revenuePerArea',
-                'topTransactions'
-            ));
-        })->name('dashboard');
-
-        Route::get('/laporan/export', function (\Illuminate\Http\Request $request) {
+        Route::get('/dashboard', function (Request $request) {
             $mode = $request->mode ?? 'single';
-            $today = \Carbon\Carbon::today();
+            $today = Carbon::today();
             $date = $request->date ?? $today->toDateString();
             $from = $request->from ?? $today->copy()->subDays(6)->toDateString();
             $to = $request->to ?? $today->toDateString();
 
-            $baseQuery = \App\Models\Transaction::whereNotNull('exit_time');
+            $baseQuery = Transaction::whereNotNull('exit_time');
 
-            if ($mode === 'range') {
-                $transactions = (clone $baseQuery)
-                    ->whereBetween('exit_time', [$from, $to])
-                    ->with('vehicle', 'area')
-                    ->orderBy('exit_time', 'desc')
-                    ->get();
-            } else {
-                $transactions = (clone $baseQuery)
-                    ->whereDate('exit_time', $date)
-                    ->with('vehicle', 'area')
-                    ->orderBy('exit_time', 'desc')
-                    ->get();
-            }
+            // Filter Utama
+            $filteredData = (clone $baseQuery)
+                ->when(
+                    $mode === 'range',
+                    fn($q) => $q->whereBetween('exit_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
+                    fn($q) => $q->whereDate('exit_time', $date)
+                );
 
-            return Excel::download(
-                new \App\Exports\DashboardExport($transactions, $mode, $date, $from, $to),
-                'rekap_parkir_' . now()->format('Y-m-d_His') . '.xlsx'
-            );
-        })->name('laporan.export');
+            // METRICS UNTUK CARD
+            $filteredTotalRevenue = (clone $filteredData)->sum('amount');
+            $filteredTotalCount = (clone $filteredData)->count(); // Total unit keluar di periode ini
+            $monthRevenue = (clone $baseQuery)
+                ->whereBetween('exit_time', [$today->copy()->startOfMonth(), $today->copy()->endOfMonth()])
+                ->sum('amount');
+            $currentlyParked = Transaction::whereNull('exit_time')->count();
+
+            $chartData = (clone $filteredData)
+                ->selectRaw('DATE(exit_time) as date, SUM(amount) as total')
+                ->groupBy('date')->orderBy('date')->get();
+
+            $vehicleRecap = Transaction::when(
+                $mode === 'range',
+                fn($q) => $q->whereBetween('entry_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
+                fn($q) => $q->whereDate('entry_time', $date)
+            )
+                ->join('vehicles', 'transactions.vehicle_id', '=', 'vehicles.id')
+                ->selectRaw('vehicles.type, COUNT(*) as count')
+                ->groupBy('vehicles.type')->get();
+
+            $areaOccupancy = Area::withCount(['transactions as occupied' => function ($q) {
+                $q->whereNull('exit_time');
+            }])->get()->map(function ($area) {
+                $percentage = $area->capacity > 0 ? round(($area->occupied / $area->capacity) * 100, 1) : 0;
+                return [
+                    'name' => $area->name,
+                    'capacity' => $area->capacity,
+                    'occupied' => $area->occupied,
+                    'percentage' => $percentage,
+                    'status' => $percentage >= 90 ? 'full' : ($percentage >= 70 ? 'warning' : 'available')
+                ];
+            });
+
+            return view('owner.dashboard', compact(
+                'filteredTotalRevenue',
+                'filteredTotalCount',
+                'monthRevenue',
+                'currentlyParked',
+                'chartData',
+                'vehicleRecap',
+                'areaOccupancy',
+                'mode',
+                'date',
+                'from',
+                'to'
+            ));
+        })->name('dashboard');
+
+        // Route Export
+        Route::get('/export-excel', function (Request $request) {
+            $mode = $request->mode ?? 'single';
+            $today = Carbon::today();
+            $date = $request->date ?? $today->toDateString();
+            $from = $request->from ?? $today->copy()->subDays(6)->toDateString();
+            $to = $request->to ?? $today->toDateString();
+
+            $baseQuery = Transaction::whereNotNull('exit_time');
+
+            // Filter data sesuai mode
+            $transactions = (clone $baseQuery)
+                ->when(
+                    $mode === 'range',
+                    fn($q) => $q->whereBetween('exit_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
+                    fn($q) => $q->whereDate('exit_time', $date)
+                )
+                ->with('vehicle', 'area')
+                ->orderBy('exit_time', 'desc')
+                ->get();
+
+            $filename = $mode === 'range'
+                ? "Laporan_Parkir_{$from}_to_{$to}.xlsx"
+                : "Laporan_Parkir_{$date}.xlsx";
+
+            return Excel::download(new \App\Exports\DashboardExport($transactions, $mode, $date, $from, $to), $filename);
+        })->name('export.excel');
+
+        Route::get('/export-pdf', function (Request $request) {
+            $mode = $request->mode ?? 'single';
+            $today = Carbon::today();
+            $date = $request->date ?? $today->toDateString();
+            $from = $request->from ?? $today->copy()->subDays(6)->toDateString();
+            $to = $request->to ?? $today->toDateString();
+
+            $baseQuery = Transaction::whereNotNull('exit_time');
+
+            $transactions = (clone $baseQuery)
+                ->when(
+                    $mode === 'range',
+                    fn($q) => $q->whereBetween('exit_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
+                    fn($q) => $q->whereDate('exit_time', $date)
+                )
+                ->with('vehicle', 'area')
+                ->orderBy('exit_time', 'desc')
+                ->get();
+
+            $totalRevenue = $transactions->sum('amount');
+            $totalCount = $transactions->count();
+            $avgRevenue = $totalCount > 0 ? $totalRevenue / $totalCount : 0;
+
+            $pdf = DomPDF::loadView('pdfs.dashboard', [
+                'transactions' => $transactions,
+                'mode' => $mode,
+                'date' => $date,
+                'from' => $from,
+                'to' => $to,
+                'totalRevenue' => $totalRevenue,
+                'totalCount' => $totalCount,
+                'avgRevenue' => $avgRevenue,
+            ]);
+
+            $filename = $mode === 'range'
+                ? "Laporan_Parkir_{$from}_to_{$to}.pdf"
+                : "Laporan_Parkir_{$date}.pdf";
+
+            return $pdf->download($filename);
+        })->name('export.pdf');
     });
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -18,6 +18,12 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Arahkan Kamera ke Struk</h3>
+                        {{-- Letakkan di bawah teks "Arahkan Kamera ke Struk" --}}
+<div class="mb-4">
+    <select id="cameraSelection" class="w-full bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+        <option value="">Mencari kamera...</option>
+    </select>
+</div>
                         <p class="text-sm text-gray-500">Pastikan kode QR berada di dalam kotak area pindai</p>
                     </div>
 
@@ -75,61 +81,67 @@
     <script src="https://unpkg.com/html5-qrcode@2.4.9/minified/html5-qrcode.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const readerId = "reader";
-            const statusBox = document.getElementById('scanStatus');
-            const overlay = document.getElementById('loading-overlay');
-            let html5QrCode = new Html5Qrcode(readerId);
-            let isCameraRunning = false;
+    const readerId = "reader";
+    const statusBox = document.getElementById('scanStatus');
+    const overlay = document.getElementById('loading-overlay');
+    const cameraSelect = document.getElementById('cameraSelection');
+    let html5QrCode = new Html5Qrcode(readerId);
+    let isCameraRunning = false;
 
-            // Sembunyikan loading awal
+    overlay.classList.add('hidden');
+
+    // --- LANGKAH BARU: Dapatkan daftar kamera ---
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            cameraSelect.innerHTML = ''; // Kosongkan loading
+            devices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.text = device.label || `Kamera ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+        } else {
+            statusBox.textContent = "Tidak ada kamera terdeteksi.";
+        }
+    }).catch(err => {
+        console.error("Gagal mendapat daftar kamera", err);
+    });
+
+    async function startCamera() {
+        const cameraId = cameraSelect.value;
+        if (!cameraId) return alert("Pilih kamera terlebih dahulu!");
+
+        overlay.classList.remove('hidden');
+        statusBox.textContent = 'Menghubungkan kamera...';
+        
+        try {
+            const config = { 
+                fps: 15, 
+                qrbox: { width: 220, height: 220 },
+                aspectRatio: 1.0 
+            };
+
+            // Gunakan cameraId hasil pilihan dropdown, bukan 'environment' lagi
+            await html5QrCode.start(
+                cameraId, 
+                config, 
+                handleDecoded
+            );
+
+            isCameraRunning = true;
             overlay.classList.add('hidden');
+            document.getElementById('startCameraBtn').classList.add('hidden');
+            document.getElementById('stopCameraBtn').classList.remove('hidden');
+            statusBox.textContent = 'Status: Memindai aktif...';
+        } catch (err) {
+            overlay.classList.add('hidden');
+            console.error(err);
+            statusBox.textContent = 'Error: Gagal akses kamera eksternal.';
+        }
+    }
 
-            function handleDecoded(decodedText) {
-                statusBox.textContent = "QR Terdeteksi! Mengalihkan...";
-                statusBox.classList.replace('bg-gray-100', 'bg-green-100');
-                statusBox.classList.add('text-green-700');
-                
-                // Cek apakah outputnya URL atau ID
-                try {
-                    const url = new URL(decodedText);
-                    window.location.href = decodedText;
-                } catch (e) {
-                    const id = decodedText.trim();
-                    if (id) {
-                        window.location.href = `{{ url('attendant/transaction') }}/${id}/exit`;
-                    }
-                }
-            }
-
-            async function startCamera() {
-                overlay.classList.remove('hidden');
-                statusBox.textContent = 'Menghubungkan kamera...';
-                
-                try {
-                    const config = { 
-                        fps: 15, 
-                        qrbox: { width: 220, height: 220 },
-                        aspectRatio: 1.0 
-                    };
-
-                    // Gunakan 'environment' untuk kamera belakang secara otomatis
-                    await html5QrCode.start(
-                        { facingMode: "environment" }, 
-                        config, 
-                        handleDecoded
-                    );
-
-                    isCameraRunning = true;
-                    overlay.classList.add('hidden');
-                    document.getElementById('startCameraBtn').classList.add('hidden');
-                    document.getElementById('stopCameraBtn').classList.remove('hidden');
-                    statusBox.textContent = 'Status: Memindai aktif...';
-                } catch (err) {
-                    overlay.classList.add('hidden');
-                    console.error(err);
-                    statusBox.textContent = 'Error: Gagal akses kamera.';
-                }
-            }
+    // ... (fungsi stopCamera dan handleDecoded tetap sama) ...
+});
 
             async function stopCamera() {
                 if (!isCameraRunning) return;

@@ -152,6 +152,17 @@
     </div>
 
     @if($transaction->status === 'paid' || $transaction->status === 'out')
+        <table class="details-table" style="border-bottom: none;">
+            <tr>
+                <td class="label">Dibayar</td>
+                <td class="value">Rp{{ number_format($transaction->paid_amount ?? 0, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td class="label">Kembalian</td>
+                <td class="value">Rp{{ number_format($transaction->change ?? 0, 0, ',', '.') }}</td>
+            </tr>
+        </table>
+
         <div class="status-badge paid">
             SUDAH DIBAYAR / PAID
         </div>

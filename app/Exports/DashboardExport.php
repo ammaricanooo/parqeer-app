@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use Illuminate\Support\Collection;
 
 class DashboardExport implements
@@ -33,57 +34,45 @@ class DashboardExport implements
         $this->date = $date;
         $this->from = $from;
         $this->to = $to;
-
-        // hitung total pendapatan
         $this->totalAmount = $transactions->sum('amount');
     }
 
-    /**
-     * @return Collection
-     */
     public function collection()
     {
         return $this->transactions;
     }
 
-    /**
-     * @param  mixed $transaction
-     * @return array
-     */
     public function map($transaction): array
     {
+        $durationText = '-';
+        if ($transaction->duration_minutes) {
+            $hours = floor($transaction->duration_minutes / 60);
+            $minutes = $transaction->duration_minutes % 60;
+            $durationText = $hours > 0 ? "{$hours}j {$minutes}m" : "{$minutes}m";
+        }
+
         return [
-            $transaction->vehicle->plate_number ?? '-',
-            ucfirst($transaction->vehicle->type ?? '-'),
-            $transaction->vehicle->color ?? '-',
+            strtoupper($transaction->vehicle->plate_number ?? '-'),
+            strtoupper($transaction->vehicle->type ?? '-'),
             $transaction->area->name ?? '-',
-            $transaction->entry_time
-                ? \Carbon\Carbon::parse($transaction->entry_time)->format('Y-m-d H:i:s')
-                : '-',
-            $transaction->exit_time
-                ? \Carbon\Carbon::parse($transaction->exit_time)->format('Y-m-d H:i:s')
-                : '-',
-            $transaction->duration_minutes
-                ? round($transaction->duration_minutes / 60, 2) . ' jam'
-                : '-',
-            'Rp ' . number_format($transaction->amount ?? 0, 0, ',', '.'),
+            $transaction->entry_time ? \Carbon\Carbon::parse($transaction->entry_time)->format('d/m/Y H:i') : '-',
+            $transaction->exit_time ? \Carbon\Carbon::parse($transaction->exit_time)->format('d/m/Y H:i') : '-',
+            $durationText,
+            // Kembalikan angka murni tanpa "Rp" agar Excel mengenalnya sebagai Number
+            $transaction->amount ?? 0,
         ];
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
-            'Plat Nomor',
-            'Tipe Kendaraan',
-            'Warna',
-            'Area Parkir',
-            'Waktu Masuk',
-            'Waktu Keluar',
-            'Durasi',
-            'Tarif Parkir',
+            'NO. PLAT',
+            'JENIS',
+            'AREA LOKASI',
+            'WAKTU MASUK',
+            'WAKTU KELUAR',
+            'DURASI',
+            'NILAI TARIF (IDR)',
         ];
     }
 
@@ -91,55 +80,65 @@ class DashboardExport implements
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-
                 $sheet = $event->sheet->getDelegate();
+                $lastRow = $sheet->getHighestRow();
+                $fullRange = "A1:G{$lastRow}";
 
-                // ================= HEADER STYLE =================
-                $sheet->getStyle('A1:H1')->applyFromArray([
+                // 1. STYLE SEMUA SEL (Font & Alignment)
+                $sheet->getStyle($fullRange)->applyFromArray([
+                    'font' => ['name' => 'Arial', 'size' => 10],
+                    'alignment' => [
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                    ],
+                ]);
+
+                // 2. HEADER STYLE (Hitam Putih / Monochrome)
+                $sheet->getStyle('A1:G1')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'color' => ['rgb' => 'FFFFFF'],
                     ],
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => '107C41'],
+                        'startColor' => ['rgb' => '262626'], // Hitam Abu-abu (Elegant)
                     ],
                     'alignment' => [
                         'horizontal' => Alignment::HORIZONTAL_CENTER,
-                        'vertical'   => Alignment::VERTICAL_CENTER,
                     ],
                 ]);
 
-                // ================= TOTAL ROW =================
-                $lastRow = $sheet->getHighestRow() + 1;
+                // 3. FORMAT KOLOM MATA UANG (Accounting Format)
+                // Ini membuat angka tetap bisa di-SUM di Excel tapi terlihat ada Rp-nya
+                $sheet->getStyle("G2:G{$lastRow}")
+                    ->getNumberFormat()
+                    ->setFormatCode('_("Rp"* #,##0_);_("Rp"* (#,##0);_("Rp"* "-"??_);_(@_)');
 
-                // Merge label
-                $sheet->mergeCells("A{$lastRow}:G{$lastRow}");
-                $sheet->setCellValue("A{$lastRow}", 'TOTAL PENDAPATAN');
-                $sheet->setCellValue(
-                    "H{$lastRow}",
-                    'Rp ' . number_format($this->totalAmount, 0, ',', '.')
-                );
+                // 4. TOTAL ROW STYLE
+                $totalRow = $lastRow + 1;
+                $sheet->mergeCells("A{$totalRow}:F{$totalRow}");
+                $sheet->setCellValue("A{$totalRow}", 'TOTAL AKUMULASI PENDAPATAN');
+                $sheet->setCellValue("G{$totalRow}", $this->totalAmount);
 
-                // Style total row
-                $sheet->getStyle("A{$lastRow}:H{$lastRow}")->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                    ],
+                $sheet->getStyle("A{$totalRow}:G{$totalRow}")->applyFromArray([
+                    'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'E5E7EB'], // abu-abu lembut
+                        'startColor' => ['rgb' => 'F2F2F2'],
                     ],
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_RIGHT,
-                        'vertical'   => Alignment::VERTICAL_CENTER,
+                    'borders' => [
+                        'top' => ['borderStyle' => Border::BORDER_THIN],
+                        'bottom' => ['borderStyle' => Border::BORDER_DOUBLE], // Garis dua khas akuntansi
                     ],
                 ]);
 
-                // Align label kiri
-                $sheet->getStyle("A{$lastRow}")
-                    ->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle("G{$totalRow}")
+                    ->getNumberFormat()
+                    ->setFormatCode('_("Rp"* #,##0_);_("Rp"* (#,##0);_("Rp"* "-"??_);_(@_)');
+
+                $sheet->getStyle("A{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                // 5. BORDER UNTUK SELURUH TABEL
+                $sheet->getStyle("A1:G{$totalRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             },
         ];
     }

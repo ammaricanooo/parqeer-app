@@ -10,8 +10,8 @@
     </x-slot>
 
     <section class="pt-12 pb-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white relative shadow-md sm:rounded-lg p-4">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="bg-white relative shadow-md rounded-lg space-y-3 md:space-y-0 md:space-x-4 p-4">
 
                 <!-- Title -->
                 <div class="flex items-center px-4 py-2">
@@ -72,7 +72,7 @@
 
                             @if($areas->isEmpty())
                                 <div class="p-3 bg-red-50 rounded text-sm text-red-700">
-                                    Tidak ada area tersedia (semua penuh)
+                                    Tidak ada area tersedia
                                 </div>
                                 <select disabled
                                     class="bg-gray-100 border border-gray-300 text-sm rounded-lg block w-full p-2.5 mt-2">

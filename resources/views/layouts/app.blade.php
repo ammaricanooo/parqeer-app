@@ -14,6 +14,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900 pb-4">
@@ -59,7 +60,7 @@
             <!-- Page Content -->
             <main>
                 {{ $slot }}
-                <p class="text-center">2026 Ammar Abdul Malik - XII RPL SMK BINA INFORATIKA</p>
+                <p class="text-center text-xs text-gray-400">© 2026 Ammar Abdul Malik - XII RPL <br>SMK BINA INFORMATIKA</p>
             </main>
         </div>
     </body>

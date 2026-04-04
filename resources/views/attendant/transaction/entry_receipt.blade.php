@@ -79,8 +79,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Entry ticket QR selalu mengarah ke pembayaran publik
-            const qrUrl = '{{ route('payment.public', $transaction->id) }}';
+            // Entry ticket QR akan mengarah ke scan ticket petugas (attendant)
+            const qrUrl = '{{ route('attendant.transaction.scan-ticket', $transaction->id) }}';
 
             // Setup QR Code
             new QRCode(document.getElementById("qrcode"), {

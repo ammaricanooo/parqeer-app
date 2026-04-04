@@ -4,8 +4,8 @@
     </x-slot>
 
     <section class="pt-12 pb-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="bg-white relative shadow-md rounded-lg overflow-hidden">
 
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between p-4">
