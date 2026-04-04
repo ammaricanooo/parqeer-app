@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="title">
-        Edit Data Tarif Parkir
+        Edit Data Tarif Parqeer
     </x-slot>
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Data Tarif Parkir') }}
+            {{ __('Edit Data Tarif Parqeer') }}
         </h2>
     </x-slot>
 
@@ -29,8 +29,7 @@
 
                         <!-- Area -->
                         <div>
-                            <label for="area_id"
-                                class="block mb-2 text-sm font-medium text-gray-900">
+                            <label for="area_id" class="block mb-2 text-sm font-medium text-gray-900">
                                 Area
                             </label>
                             <select name="area_id" id="area_id"
@@ -48,47 +47,43 @@
 
                         <!-- Vehicle Type -->
                         <div>
-                            <label for="vehicle_type"
-                                class="block mb-2 text-sm font-medium text-gray-900">
+                            <label for="vehicle_type" class="block mb-2 text-sm font-medium text-gray-900">
                                 Jenis Kendaraan
                             </label>
                             <input type="text" name="vehicle_type" id="vehicle_type"
                                 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
                                 placeholder="Masukkan jenis kendaraan"
-                                value="{{ old('vehicle_type', $rate->vehicle_type) }}"
-                                required>
+                                value="{{ old('vehicle_type', $rate->vehicle_type) }}" required>
                             <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" />
                         </div>
 
                         <!-- Amount -->
                         <div>
-                            <label for="amount"
-                                class="block mb-2 text-sm font-medium text-gray-900">
+                            <label for="amount" class="block mb-2 text-sm font-medium text-gray-900">
                                 Tarif
                             </label>
                             <input type="number" name="amount" id="amount"
                                 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="Masukkan tarif"
-                                value="{{ old('amount', $rate->amount) }}"
-                                required>
+                                placeholder="Masukkan tarif" value="{{ old('amount', $rate->amount) }}" required>
                             <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                         </div>
 
                     </div>
-
-                    <!-- Button -->
-                    <div class="block w-full mt-6">
+                    <div class="flex items-center justify-end gap-4 w-full mt-4">
                         <button type="submit"
-                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 font-medium rounded-lg text-sm px-4 py-2">
-                            <svg class="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor"
-                                viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                class="h-5 w-5 mr-2 -ml-0.5">
+                                <path fill="currentColor"
+                                    d="M21 7v12q0 .825-.587 1.413T19 21H5q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h12zm-2 .85L16.15 5H5v14h14zM12 18q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-6-8h9V6H6zM5 7.85V19V5z" />
                             </svg>
-                            Edit Data Tarif Parkir
+                            Simpan Data Tarif
                         </button>
+                        <a href="/admin/rates"
+                            class="flex items-center justify-center text-white bg-gray-400 hover:bg-gray-400/75 focus:ring-4 focus:ring-gray-400/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
+                            Kembali
+                        </a>
                     </div>
-
                 </form>
             </div>
         </div>

@@ -3,27 +3,14 @@
         Data Area Parkir
     </x-slot>
 
-    <section class="pt-12 pb-6">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <section class="py-6">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
             <div class="bg-white relative shadow-md rounded-lg overflow-hidden">
 
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between p-4">
                     <h5 class="text-gray-800 font-semibold">Data Area Parkir</h5>
                 </div>
-
-                <!-- Flash Messages -->
-                @if(session('success'))
-                    <div class="mx-4 mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="mx-4 mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                        {{ session('error') }}
-                    </div>
-                @endif
 
                 <!-- Action & Search -->
                 <div

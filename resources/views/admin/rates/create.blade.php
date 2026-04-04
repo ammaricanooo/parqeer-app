@@ -1,11 +1,10 @@
 <x-app-layout>
     <x-slot name="title">
-        Tambah Data Tarif Parkir
+        Tambah Data Tarif Parqeer
     </x-slot>
-
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Data Tarif Parkir') }}
+            {{ __('Tambah Data Tarif Parqeer') }}
         </h2>
     </x-slot>
 
@@ -80,7 +79,7 @@
                     <!-- Button -->
                     <div class="block w-full mt-6">
                         <button type="submit"
-                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 font-medium rounded-lg text-sm px-4 py-2">
+                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
                             <svg class="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor"
                                 viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" clip-rule="evenodd"

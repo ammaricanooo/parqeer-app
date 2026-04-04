@@ -1,26 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800  leading-tight">
             {{ __('Scanner QR - Keluar Kendaraan') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div class="bg-white  overflow-hidden shadow-xl sm:rounded-2xl border border-gray-200 ">
                 <div class="p-6">
                     
                     {{-- Header Scan --}}
                     <div class="text-center mb-6">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100  rounded-full mb-4">
                             <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Arahkan Kamera ke Struk</h3>
+                        <h3 class="text-lg font-bold text-gray-900 ">Arahkan Kamera ke Struk</h3>
                         {{-- Letakkan di bawah teks "Arahkan Kamera ke Struk" --}}
 <div class="mb-4">
-    <select id="cameraSelection" class="w-full bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+    <select id="cameraSelection" class="w-full bg-gray-50  border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
         <option value="">Mencari kamera...</option>
     </select>
 </div>
@@ -28,7 +28,7 @@
                     </div>
 
                     {{-- Kamera / Reader Area --}}
-                    <div class="relative rounded-xl overflow-hidden bg-black aspect-square border-4 border-gray-100 dark:border-gray-700 shadow-inner">
+                    <div class="relative rounded-xl overflow-hidden bg-black aspect-square border-4 border-gray-100  shadow-inner">
                         <div id="reader" class="w-full h-full"></div>
                         {{-- Overlay Loading --}}
                         <div id="loading-overlay" class="absolute inset-0 flex items-center justify-center bg-gray-900 text-white z-10">
@@ -41,7 +41,7 @@
 
                     {{-- Controls --}}
                     <div class="mt-6 space-y-4">
-                        <div id="scanStatus" class="text-center text-sm font-medium py-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        <div id="scanStatus" class="text-center text-sm font-medium py-2 px-4 rounded-lg bg-gray-100  text-gray-600 ">
                             Status: Siap memindai
                         </div>
 
@@ -53,19 +53,19 @@
                                 Tutup Kamera
                             </button>
                             
-                            <label class="flex-1 min-w-[140px] flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-4 rounded-xl cursor-pointer transition duration-200">
+                            <label class="flex-1 min-w-[140px] flex items-center justify-center bg-gray-200  hover:bg-gray-300 text-gray-800  font-bold py-3 px-4 rounded-xl cursor-pointer transition duration-200">
                                 <span>Upload QR</span>
                                 <input type="file" id="qrFile" accept="image/*" class="hidden" />
                             </label>
                         </div>
 
                         {{-- Manual Input --}}
-                        <div class="pt-6 border-t border-gray-100 dark:border-gray-700">
+                        <div class="pt-6 border-t border-gray-100 ">
                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider text-center mb-3">Atau Input Manual</p>
                             <div class="flex gap-2">
                                 <input type="text" id="manualId" placeholder="Contoh: 12345"
-                                    class="flex-1 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3 font-mono" />
-                                <button id="goBtn" class="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 px-6 rounded-xl font-bold hover:opacity-90 transition">
+                                    class="flex-1 bg-gray-50  border-gray-300  text-gray-900  rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3 font-mono" />
+                                <button id="goBtn" class="bg-gray-800  text-white  px-6 rounded-xl font-bold hover:opacity-90 transition">
                                     Cari
                                 </button>
                             </div>

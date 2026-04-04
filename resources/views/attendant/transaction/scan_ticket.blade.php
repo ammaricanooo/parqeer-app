@@ -1,19 +1,19 @@
 <x-app-layout>
-    <div class="min-h-screen bg-slate-100 dark:bg-gray-950 p-4 lg:p-8">
+    <div class="min-h-screen bg-slate-100 p-4 lg:p-8">
         <div class="max-w-[1400px] mx-auto">
             
-            <div class="flex justify-between items-center mb-6 bg-white dark:bg-gray-900 p-5 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800">
+            <div class="flex justify-between items-center mb-6 bg-white  p-5 rounded-3xl shadow-sm border border-gray-200 ">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white font-black italic text-xl">
                         P
                     </div>
                     <div>
-                        <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-none uppercase">Gate <span class="text-indigo-600">Scanner</span></h1>
+                        <h1 class="text-2xl font-black text-gray-900  tracking-tight leading-none uppercase">Gate <span class="text-indigo-600">Scanner</span></h1>
                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 italic">Transaction Verification System</p>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <a href="{{ route('attendant.transaction.index') }}" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-200 transition-all text-sm">
+                    <a href="{{ route('attendant.transaction.index') }}" class="px-6 py-2.5 bg-gray-100  text-gray-600  font-bold rounded-xl hover:bg-gray-200 transition-all text-sm">
                         Batal
                     </a>
                 </div>
@@ -22,20 +22,20 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 <div class="lg:col-span-7 space-y-6">
-                    <div class="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-sm border border-gray-200 dark:border-gray-800 p-10 relative overflow-hidden flex flex-col justify-center min-h-[350px]">
-                        <div class="absolute -right-16 -bottom-16 opacity-[0.03] dark:opacity-[0.07] pointer-events-none">
+                    <div class="bg-white  rounded-[2.5rem] shadow-sm border border-gray-200  p-10 relative overflow-hidden flex flex-col justify-center min-h-[350px]">
+                        <div class="absolute -right-16 -bottom-16 opacity-[0.03] pointer-events-none">
                             <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg>
                         </div>
                         
                         <div class="relative z-10">
                             <div class="flex items-center gap-3 mb-4">
-                                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-black text-[10px] uppercase tracking-widest rounded-lg">ID #{{ $transaction->id }}</span>
+                                <span class="px-3 py-1 bg-indigo-100 text-indigo-600 font-black text-[10px] uppercase tracking-widest rounded-lg">ID #{{ $transaction->id }}</span>
                                 <span class="px-3 py-1 bg-{{ $transaction->status === 'in' ? 'amber' : 'green' }}-100 dark:bg-{{ $transaction->status === 'in' ? 'amber' : 'green' }}-900/40 text-{{ $transaction->status === 'in' ? 'amber' : 'green' }}-600 dark:text-{{ $transaction->status === 'in' ? 'amber' : 'green' }}-400 font-black text-[10px] uppercase tracking-widest rounded-lg">
                                     {{ $transaction->status }}
                                 </span>
                             </div>
                             
-                            <h2 class="text-8xl md:text-[10rem] font-black tracking-tighter text-gray-900 dark:text-white leading-none">
+                            <h2 class="text-8xl md:text-[10rem] font-black tracking-tighter text-gray-900  leading-none">
                                 {{ $transaction->plate_number }}
                             </h2>
                             <p class="text-2xl font-bold text-gray-400 mt-4 italic uppercase tracking-tighter">{{ $transaction->vehicle_color ?? 'No Color Data' }} — {{ $transaction->area->name }}</p>
@@ -43,12 +43,12 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white dark:bg-gray-900 p-8 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm">
+                        <div class="bg-white  p-8 rounded-[2rem] border border-gray-200  shadow-sm">
                             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Waktu Masuk</p>
-                            <p class="text-3xl font-black text-gray-900 dark:text-white leading-none tracking-tight">{{ $transaction->entry_time->format('H:i') }}</p>
+                            <p class="text-3xl font-black text-gray-900  leading-none tracking-tight">{{ $transaction->entry_time->format('H:i') }}</p>
                             <p class="text-sm font-bold text-gray-400 mt-1 uppercase">{{ $transaction->entry_time->format('d M Y') }}</p>
                         </div>
-                        <div class="bg-white dark:bg-gray-900 p-8 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-center">
+                        <div class="bg-white  p-8 rounded-[2rem] border border-gray-200  shadow-sm flex flex-col justify-center">
                             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Durasi Parkir</p>
                             <p class="text-3xl font-black text-indigo-600 leading-none tracking-tight">
                                 {{ $transaction->entry_time->diff(now())->format('%h Jam %i Menit') }}

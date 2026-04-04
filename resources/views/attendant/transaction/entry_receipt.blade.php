@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight no-print">
+        <h2 class="font-semibold text-xl text-gray-800  leading-tight no-print">
             {{ __('Struk Kendaraan Masuk') }}
         </h2>
     </x-slot>
@@ -9,19 +9,19 @@
         <div class="max-w-md mx-auto sm:px-6 lg:px-8">
 
             {{-- AREA YANG AKAN DI PRINT --}}
-            <div id="print-area" class="bg-white dark:bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-8 border-2 border-dashed border-gray-200 dark:border-gray-700">
-                <div class="text-gray-900 dark:text-gray-100">
+            <div id="print-area" class="bg-white  overflow-hidden shadow-sm sm:rounded-lg p-8 border-2 border-dashed border-gray-200 ">
+                <div class="text-gray-900 ">
 
                     {{-- Header Struk --}}
                     <div class="text-center mb-6">
                         <h3 class="font-black text-3xl tracking-tighter uppercase italic text-blue-600">Parqeer</h3>
                         <p class="text-xs uppercase tracking-widest opacity-70">Layanan Parkir Digital</p>
-                        <div class="border-b-2 border-black dark:border-white my-2 w-1/2 mx-auto"></div>
+                        <div class="border-b-2 border-black  my-2 w-1/2 mx-auto"></div>
                         <p class="text-[10px] font-mono opacity-60">ID: #{{ $transaction->id }}</p>
                     </div>
 
                     {{-- Plat Nomor (Fokus Utama) --}}
-                    <div class="bg-gray-100 dark:bg-gray-800 py-4 px-2 rounded-md border-2 border-black dark:border-white mb-6 text-center">
+                    <div class="bg-gray-100  py-4 px-2 rounded-md border-2 border-black  mb-6 text-center">
                         <p class="text-xs uppercase font-semibold mb-1 opacity-70">Nomor Kendaraan</p>
                         <h4 class="text-3xl font-black tracking-widest font-mono italic">
                             {{ $transaction->plate_number }}
@@ -29,7 +29,7 @@
                     </div>
 
                     {{-- Grid Detail --}}
-                    <div class="grid grid-cols-2 gap-y-4 gap-x-6 mb-8 text-sm border-y border-dashed border-gray-300 dark:border-gray-600 py-4 font-mono">
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6 mb-8 text-sm border-y border-dashed border-gray-300  py-4 font-mono">
                         <div>
                             <p class="text-[10px] uppercase text-gray-500">Warna</p>
                             <p class="font-bold uppercase">{{ $transaction->vehicle_color }}</p>
@@ -64,7 +64,7 @@
             {{-- BUTTON ACTIONS --}}
             <div class="flex gap-3 justify-center mt-6 no-print">
                 <a href="{{ route('attendant.transaction.index') }}"
-                   class="inline-flex items-center px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition ease-in-out duration-150">
+                   class="inline-flex items-center px-6 py-3 bg-white  border border-gray-300  rounded-md font-semibold text-xs text-gray-700  uppercase tracking-widest shadow-sm hover:bg-gray-50  transition ease-in-out duration-150">
                     ← Kembali
                 </a>
                 <button id="printBtn" class="inline-flex items-center px-6 py-3 bg-blue-600 border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg shadow-blue-500/30">

@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="title">
-        Tambah Data Pengguna Parkir
+        Tambah Data Pengguna Parqeer
     </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Data Pengguna Parkir') }}
+            {{ __('Tambah Data Pengguna Parqeer') }}
         </h2>
     </x-slot>
 

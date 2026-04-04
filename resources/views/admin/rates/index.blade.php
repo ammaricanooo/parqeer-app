@@ -1,10 +1,10 @@
 <x-app-layout>
-    <x-slot name="title">
+        <x-slot name="title">
         Data Tarif Parkir
     </x-slot>
 
-    <section class="pt-12 pb-6">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <section class="py-6">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
             <div class="bg-white relative shadow-md rounded-lg overflow-hidden">
 
                 <!-- Header -->

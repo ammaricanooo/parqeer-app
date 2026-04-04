@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800  leading-tight">
             {{ __('Tambah Kendaraan Baru') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            <div class="bg-white  overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 ">
                     <form action="{{ route('attendant.vehicle.store') }}" method="POST">
                         @csrf
 
@@ -18,7 +18,7 @@
                                 Plat Nomor <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="plate_number" name="plate_number" 
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 focus:outline-none focus:ring-blue-500"
+                                class="w-full px-3 py-2 border border-gray-300  rounded-md  focus:outline-none focus:ring-blue-500"
                                 placeholder="Contoh: B 1234 XYZ"
                                 required
                                 value="{{ old('plate_number') }}"
@@ -34,7 +34,7 @@
                                 Warna <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="color" name="color" 
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 focus:outline-none focus:ring-blue-500"
+                                class="w-full px-3 py-2 border border-gray-300  rounded-md  focus:outline-none focus:ring-blue-500"
                                 placeholder="Contoh: Merah, Putih, Biru"
                                 required
                                 value="{{ old('color') }}">
@@ -49,7 +49,7 @@
                                 Tipe Kendaraan <span class="text-red-500">*</span>
                             </label>
                             <select id="type" name="type" 
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 focus:outline-none focus:ring-blue-500"
+                                class="w-full px-3 py-2 border border-gray-300  rounded-md  focus:outline-none focus:ring-blue-500"
                                 required>
                                 <option value="">-- Pilih Tipe --</option>
                                 <option value="motorcycle" {{ old('type') == 'motorcycle' ? 'selected' : '' }}>Motor</option>

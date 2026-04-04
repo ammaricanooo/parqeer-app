@@ -92,21 +92,6 @@
                                 class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link">Login
                             </a>
                         @endif
-                        {{-- Google Translate Start --}}
-                        <div>
-                            {{-- Google Translate Trigger Button (gambar Google Translate) --}}
-                            <button id="translateButton" class="border-none bg-none mt-2 p-0">
-                                <img src="https://www.google.com/images/icons/product/translate-32.png"
-                                    alt="Google Translate" style="cursor: pointer;">
-                            </button>
-                            {{-- Google Translate Widget --}}
-                            <div class="relative">
-                                <div id="google_translate_element"
-                                    class="hidden absolute z-10 text-center -bottom-28 -left-72">
-                                </div>
-                            </div>
-                        </div>
-                        {{-- Google Translate End --}}
                     </nav>
                 </div>
                 {{-- Button Drawer For Mobile --}}
@@ -138,20 +123,6 @@
                     class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link-drawer">Login
                 </a>
             @endif
-            {{-- Google Translate Start --}}
-            <div>
-                {{-- Google Translate Trigger Button (gambar Google Translate) --}}
-                <button id="translateButton" class="border-none bg-none mt-2 p-0">
-                    <img src="https://www.google.com/images/icons/product/translate-32.png" alt="Google Translate"
-                        style="cursor: pointer;">
-                </button>
-                {{-- Google Translate Widget --}}
-                <div class="relative">
-                    <div id="google_translate_element" class="hidden absolute z-10 text-center -bottom-28 -left-72">
-                    </div>
-                </div>
-            </div>
-            {{-- Google Translate End --}}
         </nav>
     </div>
     {{-- Header Section End --}}
@@ -166,7 +137,7 @@
                 poster="/assets/images/videobg.jpg" class="absolute inset-0 w-full h-full object-cover brightness-75">
                 <source src="video/video.mp4" type="video/mp4">
             </video>
-            <div class="relative pt-48 pb-32 w-full flex items-center max-w-screen-xl">
+            <div class="relative pt-48 pb-32 w-full flex items-center max-w-screen-xl h-screen">
                 <div class="relative w-full h-full text-center md:text-left">
                     <div class="px-5">
                         <div
@@ -201,6 +172,8 @@
                 </svg>
             </div>
         </section>
+        <p class="text-center text-gray-400 mt-14 mb-10">© 2026 Ammar Abdul Malik - XII RPL <br>SMK BINA INFORMATIKA
+        </p>
         {{-- Hero Section End --}}
     </main>
 
