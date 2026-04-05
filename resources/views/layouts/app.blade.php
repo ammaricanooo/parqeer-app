@@ -63,5 +63,6 @@
                 <p class="text-center text-xs text-gray-400">© 2026 Ammar Abdul Malik - XII RPL <br>SMK BINA INFORMATIKA</p>
             </main>
         </div>
+        <script src="https://website-widgets.pages.dev/dist/sienna.min.js" defer></script> 
     </body>
 </html>

@@ -33,6 +33,10 @@
                                 </svg>
                             </div>
                         </form>
+                        <a href="{{ route('attendant.transaction.scan') }}"
+                            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all">
+                            Scan QR
+                        </a>
                         <a href="{{ route('attendant.transaction.create') }}"
                             class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all">
                             + Baru
