@@ -73,6 +73,9 @@
                                         Rp {{ number_format($rate->amount, 0, ',', '.') }}
                                     </td>
                                     <td class="px-4 py-3">
+                                        {{ $rate->pricing_type === 'fixed' ? 'Harga Tetap' : 'Per Jam' }}
+                                    </td>
+                                    <td class="px-4 py-3">
                                         <div class="flex items-center space-x-3">
 
                                             <a href="{{ route('admin.rates.edit', $rate->id) }}"

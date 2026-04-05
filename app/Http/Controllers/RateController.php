@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rate;
 use App\Models\Area;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreRateRequest;
 use App\Http\Requests\UpdateRateRequest;
 
@@ -52,9 +53,7 @@ class RateController extends Controller
      */
     public function create()
     {
-        $areas = Area::whereNotIn('id', function ($query) {
-            $query->select('area_id')->from('rates');
-        })->get();
+        $areas = Area::all();
         return view('admin.rates.create', compact('areas'));
     }
 
@@ -64,14 +63,22 @@ class RateController extends Controller
     public function store(StoreRateRequest $request)
     {
         $request->validate([
-            'area_id' => 'required|exists:areas,id|unique:rates,area_id',
-            'vehicle_type' => 'required|string|max:50',
-            'amount' => 'required|integer|min:0',
+            'area_id' => [
+                'required',
+                'exists:areas,id',
+                Rule::unique('rates')->where(function ($query) use ($request) {
+                    return $query->where('vehicle_type', $request->vehicle_type);
+                }),
+            ],
+            'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
+            'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
+            'amount' => 'required|numeric|min:0',
         ]);
 
         Rate::create([
             'area_id'      => $request->area_id,
             'vehicle_type' => $request->vehicle_type,
+            'pricing_type' => $request->pricing_type,
             'amount'       => $request->amount,
         ]);
 
@@ -93,9 +100,7 @@ class RateController extends Controller
      */
     public function edit(Rate $rate, Request $request)
     {
-        $areas = Area::whereNotIn('id', function ($query) use ($rate) {
-            $query->select('area_id')->from('rates')->where('id', '!=', $rate->id);
-        })->get();
+        $areas = Area::all();
         return view('admin.rates.edit', compact('rate', 'areas'));
     }
 
@@ -105,14 +110,22 @@ class RateController extends Controller
     public function update(UpdateRateRequest $request, Rate $rate)
     {
         $request->validate([
-            'area_id' => 'required|exists:areas,id',
-            'vehicle_type' => 'required|string|max:50',
+            'area_id' => [
+                'required',
+                'exists:areas,id',
+                Rule::unique('rates')->ignore($rate->id)->where(function ($query) use ($request) {
+                    return $query->where('vehicle_type', $request->vehicle_type);
+                }),
+            ],
+            'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
+            'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
             'amount' => 'required|numeric|min:0',
         ]);
 
         $rate->update([
             'area_id'      => $request->area_id,
             'vehicle_type' => $request->vehicle_type,
+            'pricing_type' => $request->pricing_type,
             'amount'       => $request->amount,
         ]);
 
@@ -126,6 +139,14 @@ class RateController extends Controller
      */
     public function destroy(Rate $rate)
     {
+        $transactionCount = $rate->transactions()->count();
+
+        if ($transactionCount > 0) {
+            return redirect()
+                ->route('admin.rates.index')
+                ->with('error', "Rate ini tidak dapat dihapus karena masih terdapat {$transactionCount} transaksi terkait. Data transaksi historis harus dipertahankan untuk audit dan laporan.");
+        }
+
         $rate->delete();
 
         return redirect()

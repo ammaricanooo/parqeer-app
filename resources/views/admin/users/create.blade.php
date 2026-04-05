@@ -83,7 +83,7 @@
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
                         </div>
-                        <div class="block w-full mt-4">
+                        <div class="flex items-center justify-end gap-4 w-full mt-4">
                             <button type="submit"
                                 class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none">
                                 <svg class="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor" viewbox="0 0 20 20"

@@ -8,7 +8,7 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="grid gap-4 sm:grid-cols-4">
+                    <div class="grid gap-4 sm:grid-cols-3">
 
                         <div>
                             <label class="block mb-2 text-sm font-medium">Nama Area</label>

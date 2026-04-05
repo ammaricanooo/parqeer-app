@@ -100,16 +100,21 @@ class Transaction extends Model
         // Hitung durasi dalam menit
         $duration = $this->entry_time->diffInMinutes($paymentTime);
 
-        // Hitung amount berdasarkan rate (per jam)
-        // Minimal 1 jam untuk semua transaksi
+        // Hitung amount berdasarkan rate.
         $hours = max(1, ceil($duration / 60));
         $rateAmount = $this->rate ? $this->rate->amount : 0;
-        $amount = $rateAmount * $hours;
+
+        if ($this->rate && $this->rate->pricing_type === 'fixed') {
+            $amount = $rateAmount;
+        } else {
+            $amount = $rateAmount * $hours;
+        }
 
         return [
             'duration_minutes' => $duration,
             'hours' => $hours,
             'amount' => $amount,
+            'pricing_type' => $this->rate ? $this->rate->pricing_type : 'per_hour',
         ];
     }
 

@@ -25,7 +25,7 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="grid gap-4 sm:grid-cols-4 md:gap-6">
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
 
                         <!-- Area -->
                         <div>
@@ -50,10 +50,12 @@
                             <label for="vehicle_type" class="block mb-2 text-sm font-medium text-gray-900">
                                 Jenis Kendaraan
                             </label>
-                            <input type="text" name="vehicle_type" id="vehicle_type"
+                            <select name="vehicle_type" id="vehicle_type"
                                 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
-                                placeholder="Masukkan jenis kendaraan"
-                                value="{{ old('vehicle_type', $rate->vehicle_type) }}" required>
+                                required>
+                                <option value="car" {{ old('vehicle_type', $rate->vehicle_type) === 'car' ? 'selected' : '' }}>Mobil</option>
+                                <option value="motorcycle" {{ old('vehicle_type', $rate->vehicle_type) === 'motorcycle' ? 'selected' : '' }}>Motor</option>
+                            </select>
                             <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" />
                         </div>
 
@@ -67,6 +69,26 @@
                                 placeholder="Masukkan tarif" value="{{ old('amount', $rate->amount) }}" required>
                             <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                         </div>
+
+                        
+                        <!-- Pricing Type -->
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">Tipe Harga</label>
+                            <div class="flex gap-3">
+                                <label class="flex-1 p-3 border rounded-xl cursor-pointer bg-white">
+                                    <input type="radio" name="pricing_type" value="per_hour"
+                                        class="mr-2" {{ old('pricing_type', $rate->pricing_type) === 'per_hour' ? 'checked' : '' }}>
+                                    Per Jam
+                                </label>
+                                <label class="flex-1 p-3 border rounded-xl cursor-pointer bg-white">
+                                    <input type="radio" name="pricing_type" value="fixed"
+                                        class="mr-2" {{ old('pricing_type', $rate->pricing_type) === 'fixed' ? 'checked' : '' }}>
+                                    Harga Tetap
+                                </label>
+                            </div>
+                            <x-input-error :messages="$errors->get('pricing_type')" class="mt-2" />
+                        </div>
+
 
                     </div>
                     <div class="flex items-center justify-end gap-4 w-full mt-4">

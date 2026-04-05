@@ -137,7 +137,7 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         // Auto-reset pembayaran yang sudah expired (lebih dari 1 jam dan belum keluar)
         $expiredPaidTransactions = Transaction::where('status', 'paid')
@@ -161,15 +161,25 @@ class TransactionController extends Controller
             }
         }
 
+        $search = $request->get('search');
+
         // Kendaraan menunggu pembayaran (status 'in' - belum bayar atau pembayaran expired)
         $pendingPaymentTransactions = Transaction::where('status', 'in')
             ->with(['vehicle', 'area', 'rate'])
+            ->when($search, function ($query) use ($search) {
+                $query->where('plate_number', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%');
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Kendaraan sudah bayar dengan pembayaran masih valid (status 'paid' - siap keluar)
         $paidTransactions = Transaction::where('status', 'paid')
             ->with(['vehicle', 'area', 'rate'])
+            ->when($search, function ($query) use ($search) {
+                $query->where('plate_number', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%');
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -177,6 +187,10 @@ class TransactionController extends Controller
         $completedTransactions = Transaction::where('status', 'out')
             ->whereDate('exit_time', today())
             ->with(['vehicle', 'area', 'rate'])
+            ->when($search, function ($query) use ($search) {
+                $query->where('plate_number', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%');
+            })
             ->orderBy('exit_time', 'desc')
             ->get();
 

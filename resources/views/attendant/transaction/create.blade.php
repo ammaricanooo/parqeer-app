@@ -123,10 +123,15 @@
                     </div>
 
                     <!-- Button -->
-                    <div class="block w-full mt-6">
-                        <button type="submit"
-                            class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 font-medium rounded-lg text-sm px-4 py-2"
+                    <div class="flex items-center justify-end gap-4 w-full mt-4">
+                            <button type="submit"
+                                class="flex items-center justify-center text-white bg-primary hover:bg-primary/75 focus:ring-4 focus:ring-primary/20 font-medium rounded-lg text-sm px-4 py-2 focus:outline-none"
                             {{ $areas->isEmpty() ? 'disabled' : '' }}>
+                            <svg class="h-3.5 w-3.5 mr-1.5 -ml-1" fill="currentColor" viewbox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clip-rule="evenodd" fill-rule="evenodd"
+                                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                                </svg>
                             Simpan Kendaraan Masuk
                         </button>
                     </div>

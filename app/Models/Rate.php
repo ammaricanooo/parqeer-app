@@ -16,11 +16,13 @@ class Rate extends Model
         'area_id',
         'vehicle_type',
         'amount',
+        'pricing_type',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'vehicle_type' => 'string',
+        'pricing_type' => 'string',
     ];
 
     /**

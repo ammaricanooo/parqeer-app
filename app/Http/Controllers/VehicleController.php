@@ -90,6 +90,19 @@ class VehicleController extends Controller
      */
     public function destroy(Vehicle $vehicle): RedirectResponse
     {
+        $activeTransactions = $vehicle->transactions()->where('status', 'in')->count();
+        $totalTransactions = $vehicle->transactions()->count();
+
+        if ($activeTransactions > 0) {
+            return redirect()->route('attendant.vehicles.index')
+                ->with('error', "Kendaraan tidak dapat dihapus karena masih ada {$activeTransactions} transaksi aktif (kendaraan masih parkir). Data parkir harus tetap ada.");
+        }
+
+        if ($totalTransactions > 0) {
+            return redirect()->route('attendant.vehicles.index')
+                ->with('error', "Kendaraan tidak dapat dihapus karena masih memiliki {$totalTransactions} transaksi historis. Data transaksi penting untuk laporan dan audit.");
+        }
+
         $vehicle->delete();
         return redirect()->route('attendant.vehicles.index')
             ->with('success', 'Kendaraan berhasil dihapus.');
