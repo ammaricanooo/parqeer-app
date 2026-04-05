@@ -75,10 +75,6 @@
                                         </div>
 
                                         <div class="mb-5">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <label for="password" class="font-medium text-black dark:text-white">Password</label>
-                                                <a href="#" class="text-sm text-primary hover:underline">Lupa Password?</a>
-                                            </div>
                                             <div class="relative">
                                                 <input id="password" type="password" name="password" required
                                                     placeholder="••••••••"

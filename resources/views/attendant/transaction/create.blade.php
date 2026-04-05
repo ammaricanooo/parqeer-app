@@ -77,7 +77,7 @@
                                             {{ old('area_id') == $area->id ? 'selected' : '' }}>
                                             {{ $area->name }}
                                             ({{ $area->occupied }}/{{ $area->capacity }})
-                                            - {{ ucfirst($area->rates->first()->vehicle_type) }}
+                                            - {{ ucfirst($area->rates->first()->vehicle_type) }} | {{ $area->rates->first()->amount }}
                                         </option>
                                     @endforeach
                                 </select>

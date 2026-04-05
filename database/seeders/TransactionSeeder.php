@@ -26,18 +26,27 @@ class TransactionSeeder extends Seeder
             $areas = Area::factory(2)->create();
         }
 
-        // Create rates for each area and vehicle type
+        // Create one rate per area only
+        $areaRateTypes = [
+            'A-1' => 'car',
+            'B-1' => 'motorcycle',
+        ];
+
         foreach ($areas as $area) {
-            foreach (['car', 'motorcycle'] as $type) {
-                Rate::firstOrCreate(
-                    ['area_id' => $area->id, 'vehicle_type' => $type],
-                    [
-                        'amount' => $type === 'car' ? 15000 : 5000, // IDR per hour
-                        'pricing_type' => 'per_hour'
-                    ]
-                );
-            }
+            $vehicleType = $areaRateTypes[$area->name] ?? ['car', 'motorcycle'][array_rand(['car', 'motorcycle'])];
+
+            Rate::firstOrCreate(
+                ['area_id' => $area->id],
+                [
+                    'vehicle_type' => $vehicleType,
+                    'amount' => $vehicleType === 'car' ? 15000 : 5000, // IDR per hour
+                    'pricing_type' => 'per_hour'
+                ]
+            );
         }
+
+        // Reload rates after rate creation
+        $areas->load('rates');
 
         // Get users (attendants)
         $users = User::where('role', 'attendant')->get();
@@ -109,15 +118,19 @@ class TransactionSeeder extends Seeder
                     continue;
                 }
 
-                // Random vehicle and area
+                // Random vehicle and choose a matching area based on the area's single rate type
                 $vehicle = $vehicles[array_rand($vehicles)];
-                $area = $areas->random();
-                $user = $users->random();
-                $rate = $area->rates()->where('vehicle_type', $vehicle->type)->first();
+                $matchingAreas = $areas->filter(function ($area) use ($vehicle) {
+                    return optional($area->rates->first())->vehicle_type === $vehicle->type;
+                });
 
-                if (!$rate) {
+                if ($matchingAreas->isEmpty()) {
                     continue;
                 }
+
+                $area = $matchingAreas->random();
+                $user = $users->random();
+                $rate = $area->rates->first();
 
                 // Calculate amount
                 $hours = ceil($durationMinutes / 60);

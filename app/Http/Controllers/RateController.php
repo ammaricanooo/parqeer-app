@@ -53,7 +53,7 @@ class RateController extends Controller
      */
     public function create()
     {
-        $areas = Area::all();
+        $areas = Area::doesntHave('rates')->get();
         return view('admin.rates.create', compact('areas'));
     }
 
@@ -66,9 +66,7 @@ class RateController extends Controller
             'area_id' => [
                 'required',
                 'exists:areas,id',
-                Rule::unique('rates')->where(function ($query) use ($request) {
-                    return $query->where('vehicle_type', $request->vehicle_type);
-                }),
+                Rule::unique('rates'),
             ],
             'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
             'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
@@ -113,9 +111,7 @@ class RateController extends Controller
             'area_id' => [
                 'required',
                 'exists:areas,id',
-                Rule::unique('rates')->ignore($rate->id)->where(function ($query) use ($request) {
-                    return $query->where('vehicle_type', $request->vehicle_type);
-                }),
+                Rule::unique('rates')->ignore($rate->id),
             ],
             'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
             'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
