@@ -83,8 +83,16 @@
                 <div class="flex items-center">
                     <nav id="nav" class="hidden xl:flex items-center justify-center text-base gap-4 text-white">
                         {{-- Check Authorization Start --}}
-                        @if (Auth::check() && Auth::user())
-                            <a href="{{ route('dashboard') }}"
+                        @if (Auth::check() && Auth::user() && Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}"
+                                class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link">Dashboard
+                            </a>
+                        @elseif (Auth::check() && Auth::user() && Auth::user()->role === 'attendant')
+                            <a href="{{ route('attendant.transaction.index') }}"
+                                class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link">Dashboard
+                            </a>
+                        @elseif (Auth::check() && Auth::user() && Auth::user()->role === 'owner')
+                            <a href="{{ route('owner.dashboard') }}"
                                 class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link">Dashboard
                             </a>
                         @else
@@ -114,11 +122,19 @@
         class="fixed inset-0 h-0 z-40 overflow-hidden flex flex-col items-center justify-center lg:hidden bg-base/80 transition-[height] duration-300 ease-in-out backdrop-blur-lg">
         <nav class="flex flex-col items-center space-y-2 text-dark font-semibold gap-4">
             {{-- Check Authorization Start --}}
-            @if (Auth::check() && Auth::user())
-                <a href="{{ route('dashboard') }}"
+            @if (Auth::check() && Auth::user() && Auth::user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}"
                     class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link-drawer">Dashboard
                 </a>
-            @else
+            @elseif (Auth::check() && Auth::user() && Auth::user()->role === 'attendant')
+                <a href="{{ route('attendant.transaction.index') }}"
+                    class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link-drawer">Dashboard
+                </a>
+                @elseif (Auth::check() && Auth::user() && Auth::user()->role === 'owner')
+                <a href="{{ route('owner.dashboard') }}"
+                    class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link-drawer">Dashboard
+                </a>
+                @else
                 <a href="{{ route('login') }}"
                     class="h-8 rounded-full px-3 text-current flex items-center justify-center nav-link-drawer">Login
                 </a>

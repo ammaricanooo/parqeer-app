@@ -20,30 +20,42 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->createMany([
             [
-            'name'     => 'Ammar Abdul Malik',
-            'username' => 'ammar',
-            'password' => 'password',
-            'role'     => 'admin',
-            'status'   => 'active',
-        ], [
-            'name'     => 'Jawa Berkelas',
-            'username' => 'jawa',
-            'password' => 'password',
-            'role'     => 'attendant',
-            'status'   => 'active',
-        ]
+                'name'     => 'Ammar Abdul Malik',
+                'username' => 'ammar',
+                'password' => 'password',
+                'role'     => 'admin',
+                'status'   => 'active',
+            ],
+            [
+                'name'     => 'Petugas',
+                'username' => 'petugas',
+                'password' => 'password',
+                'role'     => 'attendant',
+                'status'   => 'active',
+            ],
+            [
+                'name'     => 'Owner',
+                'username' => 'Owner',
+                'password' => 'password',
+                'role'     => 'owner',
+                'status'   => 'active',
+            ]
         ]);
 
         Area::factory()->createMany([
             [
-            'name'     => 'A-1',
-            'capacity' => 20,
-            'occupied' => 0
-        ], [
-            'name'     => 'B-1',
-            'capacity' => 20,
-            'occupied' => 0
-        ]
+                'name'     => 'A-1',
+                'capacity' => 20,
+                'occupied' => 0
+            ],
+            [
+                'name'     => 'B-1',
+                'capacity' => 20,
+                'occupied' => 0
+            ]
         ]);
+
+        // Run transaction seeder
+        $this->call(TransactionSeeder::class);
     }
 }

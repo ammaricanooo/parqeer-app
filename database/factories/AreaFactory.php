@@ -16,8 +16,17 @@ class AreaFactory extends Factory
      */
     public function definition(): array
     {
+        static $areaCounter = 0;
+        $rows = ['A', 'B', 'C', 'D'];
+        $row = $rows[$areaCounter % count($rows)];
+        $number = floor($areaCounter / count($rows)) + 1;
+
+        $areaCounter++;
+
         return [
-            //
+            'name' => "{$row}-{$number}",
+            'capacity' => $this->faker->randomElement([20, 25, 30, 40, 50]),
+            'occupied' => 0,
         ];
     }
 }
