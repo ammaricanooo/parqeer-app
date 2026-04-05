@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name'     => 'Owner',
-                'username' => 'Owner',
+                'username' => 'owner',
                 'password' => 'password',
                 'role'     => 'owner',
                 'status'   => 'active',
