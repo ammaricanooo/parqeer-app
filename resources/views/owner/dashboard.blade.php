@@ -26,6 +26,17 @@
                 </svg>
                 Ekspor PDF
             </a>
+            @if(config('services.google_sheets.spreadsheet_id'))
+                <a href="https://docs.google.com/spreadsheets/d/{{ config('services.google_sheets.spreadsheet_id') }}/edit"
+                    target="_blank"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition shadow-lg shadow-blue-200 ">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Lihat Google Sheets
+                </a>
+            @endif
         </div>
         {{-- FILTER SECTION --}}
         <div
@@ -259,6 +270,53 @@
                             <p class="text-sm text-gray-400">Area tidak ditemukan</p>
                         </div>
                     @endforelse
+
+                    {{-- GOOGLE SHEETS INFO CARD --}}
+                    @if(config('services.google_sheets.spreadsheet_id'))
+                        <div class="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl border border-blue-100 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-blue-100 rounded-xl">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm">Google Sheets Backup</h4>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Real-time Sync Active</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">
+                                Data transaksi otomatis disimpan ke Google Sheets sebagai backup. Klik tombol di atas untuk melihat data real-time.
+                            </p>
+                            <div class="flex items-center gap-2 text-[10px] text-green-600 font-bold">
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                SYNC AKTIF
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-5 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl border border-yellow-100 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-yellow-100 rounded-xl">
+                                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm">Google Sheets Belum Setup</h4>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Backup Tidak Aktif</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">
+                                Setup Google Sheets untuk backup real-time data transaksi. Lihat dokumentasi GOOGLE_SHEETS_SETUP.md
+                            </p>
+                            <div class="flex items-center gap-2 text-[10px] text-orange-600 font-bold">
+                                <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                SETUP DIBUTUHKAN
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

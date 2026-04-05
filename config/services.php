@@ -41,4 +41,8 @@ return [
         'webhook_secret' => env('PAKASIR_WEBHOOK_SECRET'),
     ],
 
+    'google_sheets' => [
+        'spreadsheet_id' => env('GOOGLE_SHEETS_SPREADSHEET_ID'),
+    ],
+
 ];

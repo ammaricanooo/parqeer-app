@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Area extends Model
 {
@@ -57,6 +58,25 @@ class Area extends Model
 
         $this->occupied = $occupied;
         $this->save();
+    }
+
+    /**
+     * Update occupancy untuk semua areas sekaligus (optimized)
+     */
+    public static function updateAllOccupancy(): void
+    {
+        $occupancyCounts = Transaction::select('area_id', DB::raw('count(*) as occupied'))
+            ->where('status', '!=', 'out')
+            ->groupBy('area_id')
+            ->pluck('occupied', 'area_id');
+
+        // Reset semua occupied ke 0 dulu
+        self::query()->update(['occupied' => 0]);
+
+        // Update occupied berdasarkan count
+        foreach ($occupancyCounts as $areaId => $occupied) {
+            self::where('id', $areaId)->update(['occupied' => $occupied]);
+        }
     }
 
     /**

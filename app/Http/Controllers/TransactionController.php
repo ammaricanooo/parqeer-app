@@ -14,8 +14,9 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Events\TransactionCompleted;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -24,12 +25,10 @@ class TransactionController extends Controller
      */
     public function create(): View
     {
-        $areas = Area::with('rates')->get();
+        // Update occupancy untuk semua areas sekaligus (optimized)
+        Area::updateAllOccupancy();
 
-        // Perbarui occupied berdasarkan transaksi yang sedang berjalan
-        foreach ($areas as $area) {
-            $area->updateOccupancy();
-        }
+        $areas = Area::with('rates')->get();
 
         // Hanya tampilkan area yang masih punya slot dan memiliki tepat satu tarif (agar area menentukan tipe kendaraan)
         $availableAreas = $areas->filter(fn($a) => $a->hasAvailableSlot() && $a->rates->count() === 1);
@@ -302,6 +301,9 @@ class TransactionController extends Controller
                         ' | Kembalian: Rp ' . number_format($transaction->change),
                 ]);
             });
+
+            // Dispatch event for Google Sheets sync
+            event(new TransactionCompleted($transaction->fresh()));
 
             return redirect()->route('attendant.transaction.index')->with('success', 'Pembayaran selesai dan kendaraan keluar');
         } catch (\Exception $e) {
