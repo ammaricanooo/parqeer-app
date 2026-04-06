@@ -5,17 +5,37 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 ">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Update your account's profile information.") }}
         </p>
     </header>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+        <!-- Photo Upload -->
+        <div>
+            <x-input-label for="photo" :value="__('Profile Photo')" />
+            <div class="mt-2 flex items-center gap-4">
+                <div id="photo-preview-container" class="w-20 h-20 rounded-full overflow-hidden">
+                    @if ($user->photo)
+                        <img id="photo-preview" src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                    @else
+                        <div id="photo-placeholder" class="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112 15.996c4.125 0 7.81 1.755 10.354 4.555z" />
+                                <path d="M16.5 5.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                            </svg>
+                        </div>
+                    @endif
+                </div>
+                <div class="flex-1">
+                    <input id="photo" name="photo" type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewPhoto()" />
+                    <p class="mt-1 text-xs text-gray-600">PNG, JPG, GIF max 2MB</p>
+                </div>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('photo')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -24,27 +44,9 @@
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800 ">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600  hover:text-gray-900  rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
+            <x-input-label for="username" :value="__('Username')" />
+            <x-text-input id="username" name="username" type="text" class="mt-1 block w-full" :value="old('username', $user->username)" required autocomplete="username" />
+            <x-input-error class="mt-2" :messages="$errors->get('username')" />
         </div>
 
         <div class="flex items-center gap-4">
@@ -62,3 +64,28 @@
         </div>
     </form>
 </section>
+
+<script>
+    function previewPhoto() {
+        const photoInput = document.querySelector('#photo');
+        const previewContainer = document.querySelector('#photo-preview-container');
+
+        if (photoInput.files && photoInput.files[0]) {
+            const file = photoInput.files[0];
+
+            // Validate file type
+            if (!file.type.match('image.*')) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Replace placeholder with image preview
+                previewContainer.innerHTML = `
+                    <img id="photo-preview" src="${e.target.result}" alt="Preview" class="w-full h-full object-cover">
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

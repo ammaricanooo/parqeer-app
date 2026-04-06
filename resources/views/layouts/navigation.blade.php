@@ -47,6 +47,9 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden lg:flex lg:items-center lg:ms-6">
+                <div id="photo-preview-container" class="w-10 h-10 rounded-full overflow-hidden">
+                <img id="photo-preview" src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                </div>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500  bg-white  hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -126,9 +129,14 @@
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-white ">
-            <div class="px-4">
+            <div class="px-4 flex gap-4 items-center">
+                <div id="photo-preview-container" class="w-10 h-10 rounded-full overflow-hidden">
+                <img id="photo-preview" src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover">
+                </div>
+                <div>
                 <div class="font-medium text-base text-gray-800 ">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->role }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
