@@ -158,13 +158,14 @@
                             class="w-full h-full object-cover">
                     @else
                         <div id="photo-placeholder" class="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112 15.996c4.125 0 7.81 1.755 10.354 4.555z" />
                                 <path d="M16.5 5.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
                             </svg>
                         </div>
                     @endif
+                </div>
                     <div>
                         <div class="font-medium text-base text-gray-800 ">{{ Auth::user()->name }}</div>
                         <div class="font-medium text-sm text-gray-500">{{ Auth::user()->role }}</div>
