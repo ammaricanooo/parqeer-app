@@ -153,8 +153,8 @@
                 try {
                     // 1. Search dari local database terlebih dahulu
                     const localResponse = await fetch(
-                        `{{ route('attendant.transaction.search-vehicle') }}?q=${encodeURIComponent(value)}`
-                        );
+                        `/attendant/transaction/search/vehicle?q=${encodeURIComponent(value)}`
+                    );
                     const localVehicles = await localResponse.json();
 
                     datalist.innerHTML = '';
