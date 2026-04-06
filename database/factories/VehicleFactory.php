@@ -16,7 +16,7 @@ class VehicleFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['car', 'motorcycle']);
+        $type = $this->faker->randomElement(['car', 'motorcycle', 'truck', 'bus']);
 
         // Indonesian plate format: [LETTER] [NUMBER] [LETTER] [NUMBER]
         // Example: F 1234 AB or B 9876 XYZ

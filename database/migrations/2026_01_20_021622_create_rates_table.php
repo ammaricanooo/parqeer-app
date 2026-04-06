@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('rates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
-            $table->enum('vehicle_type', ['car', 'motorcycle']); // Beda harga per tipe
+            $table->enum('vehicle_type', ['car', 'motorcycle', 'truck', 'bus']); // Beda harga per tipe
             $table->decimal('amount', 10, 2);
             $table->timestamps();
 

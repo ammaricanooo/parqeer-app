@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('plate_number', 20)->unique();
             $table->string('color', 30);
-            $table->enum('type', ['car', 'motorcycle']); // Untuk deteksi via ANPR
+            $table->enum('type', ['car', 'motorcycle', 'truck', 'bus']); // Untuk deteksi via ANPR
             $table->timestamps();
         });
     }
