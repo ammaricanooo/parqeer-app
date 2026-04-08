@@ -5,7 +5,7 @@
                 {{ __('Detail Kendaraan - ' . $vehicle->plate_number) }}
             </h2>
             <div class="flex gap-2">
-                <a href="{{ route('attendant.vehicle.edit', $vehicle->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                <a href="{{ route('attendant.vehicles.edit', $vehicle->id) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                     Edit
                 </a>
                 <a href="{{ route('attendant.vehicles.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">

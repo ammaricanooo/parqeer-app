@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Rate;
 use App\Models\Area;
+use App\Models\VehicleType;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreRateRequest;
@@ -54,7 +55,8 @@ class RateController extends Controller
     public function create()
     {
         $areas = Area::doesntHave('rates')->get();
-        return view('admin.rates.create', compact('areas'));
+        $vehicleTypes = VehicleType::orderBy('name')->get();
+        return view('admin.rates.create', compact('areas', 'vehicleTypes'));
     }
 
     /**
@@ -62,13 +64,15 @@ class RateController extends Controller
      */
     public function store(StoreRateRequest $request)
     {
+        $availableTypes = VehicleType::pluck('key')->toArray();
+
         $request->validate([
             'area_id' => [
                 'required',
                 'exists:areas,id',
                 Rule::unique('rates'),
             ],
-            'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
+            'vehicle_type' => ['required', Rule::in($availableTypes)],
             'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
             'amount' => 'required|numeric|min:0',
         ]);
@@ -99,7 +103,8 @@ class RateController extends Controller
     public function edit(Rate $rate, Request $request)
     {
         $areas = Area::all();
-        return view('admin.rates.edit', compact('rate', 'areas'));
+        $vehicleTypes = VehicleType::orderBy('name')->get();
+        return view('admin.rates.edit', compact('rate', 'areas', 'vehicleTypes'));
     }
 
     /**
@@ -107,13 +112,15 @@ class RateController extends Controller
      */
     public function update(UpdateRateRequest $request, Rate $rate)
     {
+        $availableTypes = VehicleType::pluck('key')->toArray();
+
         $request->validate([
             'area_id' => [
                 'required',
                 'exists:areas,id',
                 Rule::unique('rates')->ignore($rate->id),
             ],
-            'vehicle_type' => ['required', Rule::in(['car', 'motorcycle'])],
+            'vehicle_type' => ['required', Rule::in($availableTypes)],
             'pricing_type' => ['required', Rule::in(['per_hour', 'fixed'])],
             'amount' => 'required|numeric|min:0',
         ]);

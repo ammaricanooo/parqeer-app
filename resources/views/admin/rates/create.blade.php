@@ -55,9 +55,12 @@
                                 class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5"
                                 required>
                                 <option value="">-- Pilih Jenis Kendaraan --</option>
-                                    <option value="car" {{ old('vehicle_type') === 'car' ? 'selected' : '' }}>Mobil</option>
-                                    <option value="motorcycle" {{ old('vehicle_type') === 'motorcycle' ? 'selected' : '' }}>Motor</option>
+                                @foreach($vehicleTypes as $type)
+                                    <option value="{{ $type->key }}" {{ old('vehicle_type') === $type->key ? 'selected' : '' }}>{{ $type->name }}</option>
+                                @endforeach
                             </select>
+                            <a href="{{ route('admin.vehicle-types.index') }}"
+                                class="text-blue-600 hover:text-blue-800 cursor-pointer mt-1 block">Tambahkan tipe kendaraan</a>
                             <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" />
                         </div>
                         <!-- Amount -->

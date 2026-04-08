@@ -197,10 +197,19 @@
                                     class="p-5 bg-gray-50  rounded-2xl border border-gray-100 /50 transition hover:border-indigo-300 text-center group">
                                     <p
                                         class="text-[10px] font-black text-gray-400  uppercase tracking-[0.15em] mb-3 group-hover:text-indigo-500 transition-colors">
-                                        {{ $vehicle->type }}
+                                        {{ match($vehicle->type) {
+                                            'car' => 'Mobil',
+                                            'motorcycle' => 'Motor',
+                                            'truck' => 'Truk',
+                                            'bus' => 'Bis',
+                                            default => $vehicle->type
+                                        } }}
                                     </p>
                                     <p class="text-3xl font-black text-gray-900  leading-none">
                                         {{ $vehicle->count }}
+                                    </p>
+                                    <p class="text-xs font-bold text-gray-500 mt-1">
+                                        Rp {{ number_format($vehicle->revenue, 0, ',', '.') }}
                                     </p>
                                 </div>
                             @endforeach
@@ -230,38 +239,42 @@
                     </h3>
 
                     @forelse($areaOccupancy as $area)
+                        @php
+                            $percentage = $area->capacity > 0 ? round(($area->occupied / $area->capacity) * 100, 1) : 0;
+                            $status = $percentage >= 90 ? 'full' : ($percentage >= 70 ? 'warning' : 'available');
+                        @endphp
                         <div
                             class="mb-4 p-5 bg-white  rounded-3xl border border-gray-100  shadow-sm overflow-hidden relative group">
-                            @if ($area['status'] === 'full')
+                            @if ($status === 'full')
                                 <div class="absolute top-0 right-0 h-1 w-full bg-red-500"></div>
                             @endif
 
                             <div class="flex items-center justify-between mb-4">
                                 <div>
                                     <span
-                                        class="font-black text-gray-800  text-sm block tracking-tight">{{ $area['name'] }}</span>
+                                        class="font-black text-gray-800  text-sm block tracking-tight">{{ $area->name }}</span>
                                     <span
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $area['occupied'] }}
-                                        / {{ $area['capacity'] }} UNIT</span>
+                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $area->occupied }}
+                                        / {{ $area->capacity }} UNIT</span>
                                 </div>
                                 <div
                                     class="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider
-                                {{ $area['status'] === 'full' ? 'bg-red-50 text-red-600' : ($area['status'] === 'warning' ? 'bg-yellow-50 text-yellow-600' : 'bg-emerald-50 text-emerald-600 ') }}">
-                                    {{ $area['status'] }}
+                                {{ $status === 'full' ? 'bg-red-50 text-red-600' : ($status === 'warning' ? 'bg-yellow-50 text-yellow-600' : 'bg-emerald-50 text-emerald-600 ') }}">
+                                    {{ $status }}
                                 </div>
                             </div>
 
                             <div
                                 class="relative h-2.5 w-full bg-gray-100  rounded-full overflow-hidden">
                                 <div class="h-full rounded-full transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                                {{ $area['percentage'] >= 90 ? 'bg-red-500' : ($area['percentage'] >= 75 ? 'bg-orange-500' : 'bg-indigo-500') }}"
-                                    style="width: {{ $area['percentage'] }}%">
+                                {{ $percentage >= 90 ? 'bg-red-500' : ($percentage >= 75 ? 'bg-orange-500' : 'bg-indigo-500') }}"
+                                    style="width: {{ $percentage }}%">
                                 </div>
                             </div>
 
                             <div class="mt-3 flex justify-end">
                                 <span
-                                    class="text-[11px] font-black text-gray-700 ">{{ $area['percentage'] }}%</span>
+                                    class="text-[11px] font-black text-gray-700 ">{{ $percentage }}%</span>
                             </div>
                         </div>
                     @empty
@@ -270,6 +283,10 @@
                             <p class="text-sm text-gray-400">Area tidak ditemukan</p>
                         </div>
                     @endforelse
+
+                    <div class="mt-4">
+                        {{ $areaOccupancy->links() }}
+                    </div>
 
                     {{-- GOOGLE SHEETS INFO CARD --}}
                     @if(config('services.google_sheets.spreadsheet_id'))

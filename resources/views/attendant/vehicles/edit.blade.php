@@ -9,7 +9,7 @@
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white  overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 ">
-                    <form action="{{ route('attendant.vehicle.update', $vehicle->id) }}" method="POST">
+                    <form action="{{ route('attendant.vehicles.update', $vehicle->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -50,9 +50,9 @@
                                 class="w-full px-3 py-2 border border-gray-300  rounded-md  focus:outline-none focus:ring-blue-500"
                                 required>
                                 <option value="">-- Pilih Tipe --</option>
-                                <option value="motorcycle" {{ old('type', $vehicle->type) == 'motorcycle' ? 'selected' : '' }}>Motor</option>
-                                <option value="car" {{ old('type', $vehicle->type) == 'car' ? 'selected' : '' }}>Mobil</option>
-
+                                @foreach($vehicleTypes as $type)
+                                    <option value="{{ $type->key }}" {{ old('type', $vehicle->type) == $type->key ? 'selected' : '' }}>{{ $type->name }}</option>
+                                @endforeach
                             </select>
                             @error('type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -64,7 +64,7 @@
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Simpan Perubahan
                             </button>
-                            <a href="{{ route('attendant.vehicle.show', $vehicle->id) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('attendant.vehicles.show', $vehicle->id) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Batal
                             </a>
                         </div>

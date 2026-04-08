@@ -6,6 +6,7 @@ use App\Http\Controllers\RateController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\VehicleTypeController;
 use App\Http\Controllers\LogActivityController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -196,18 +197,13 @@ Route::get('/laporan', function (\Illuminate\Http\Request $request) {
             ->count();
     }
 
-    // Area occupancy - current parked vehicles per area
-    $areaOccupancy = \App\Models\Area::with('transactions')->get()->map(function ($area) {
-        $occupied = $area->transactions->where('status', 'in')->count();
-        $percentage = $area->capacity > 0 ? round(($occupied / $area->capacity) * 100, 1) : 0;
-        return [
-            'name' => $area->name,
-            'capacity' => $area->capacity,
-            'occupied' => $occupied,
-            'percentage' => $percentage,
-            'status' => $percentage >= 90 ? 'full' : ($percentage >= 70 ? 'warning' : 'available')
-        ];
-    });
+    // Area occupancy - current parked vehicles per area, paginated per 3 area
+    $areaOccupancy = \App\Models\Area::withCount(['transactions as occupied' => function ($q) {
+        $q->where('status', 'in');
+    }])
+        ->orderBy('name')
+        ->paginate(3)
+        ->withQueryString();
 
     return view('owner.laporan', compact(
         'dailyTotal',
@@ -236,6 +232,13 @@ Route::get('/admin/rates/edit/{rate:id}', [RateController::class, 'edit'])->midd
 Route::put('/admin/rates/edit/{rate:id}', [RateController::class, 'update'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.rates.update');
 Route::delete('/admin/rates/{rate:id}', [RateController::class, 'destroy'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.rates.destroy');
 Route::get('/admin/rates/export/excel', [RateController::class, 'exportExcel'])->name('admin.rates.export');
+
+Route::get('/admin/vehicle-types', [VehicleTypeController::class, 'index'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.index');
+Route::get('/admin/vehicle-types/create', [VehicleTypeController::class, 'create'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.create');
+Route::post('/admin/vehicle-types', [VehicleTypeController::class, 'store'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.store');
+Route::get('/admin/vehicle-types/edit/{vehicleType:id}', [VehicleTypeController::class, 'edit'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.edit');
+Route::put('/admin/vehicle-types/edit/{vehicleType:id}', [VehicleTypeController::class, 'update'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.update');
+Route::delete('/admin/vehicle-types/{vehicleType:id}', [VehicleTypeController::class, 'destroy'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.vehicle-types.destroy');
 
 Route::get('/admin/areas', [AreaController::class, 'index'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.areas.index');
 Route::get('/admin/areas/create', [AreaController::class, 'create'])->middleware(['auth', 'verified', 'role:admin'])->name('admin.areas.create');
@@ -285,27 +288,22 @@ Route::middleware(['auth', 'verified', 'role:owner'])
                 ->selectRaw('DATE(exit_time) as date, SUM(amount) as total')
                 ->groupBy('date')->orderBy('date')->get();
 
-            $vehicleRecap = Transaction::when(
-                $mode === 'range',
-                fn($q) => $q->whereBetween('entry_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
-                fn($q) => $q->whereDate('entry_time', $date)
-            )
+            $vehicleRecap = Transaction::whereNotNull('exit_time')
+                ->when(
+                    $mode === 'range',
+                    fn($q) => $q->whereBetween('entry_time', [$from . ' 00:00:00', $to . ' 23:59:59']),
+                    fn($q) => $q->whereDate('entry_time', $date)
+                )
                 ->join('vehicles', 'transactions.vehicle_id', '=', 'vehicles.id')
-                ->selectRaw('vehicles.type, COUNT(*) as count')
+                ->selectRaw('vehicles.type, COUNT(*) as count, SUM(amount) as revenue')
                 ->groupBy('vehicles.type')->get();
 
             $areaOccupancy = Area::withCount(['transactions as occupied' => function ($q) {
                 $q->whereNull('exit_time');
-            }])->get()->map(function ($area) {
-                $percentage = $area->capacity > 0 ? round(($area->occupied / $area->capacity) * 100, 1) : 0;
-                return [
-                    'name' => $area->name,
-                    'capacity' => $area->capacity,
-                    'occupied' => $area->occupied,
-                    'percentage' => $percentage,
-                    'status' => $percentage >= 90 ? 'full' : ($percentage >= 70 ? 'warning' : 'available')
-                ];
-            });
+            }])
+                ->orderBy('name')
+                ->paginate(3)
+                ->withQueryString();
 
             return view('owner.dashboard', compact(
                 'filteredTotalRevenue',

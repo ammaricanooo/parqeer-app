@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehicle;
+use App\Models\VehicleType;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 
 class VehicleController extends Controller
 {
@@ -29,7 +31,8 @@ class VehicleController extends Controller
      */
     public function create(): View
     {
-        return view('attendant.vehicles.create');
+        $vehicleTypes = VehicleType::orderBy('name')->get();
+        return view('attendant.vehicles.create', compact('vehicleTypes'));
     }
 
     /**
@@ -39,10 +42,12 @@ class VehicleController extends Controller
     {
         $this->authorize('create', Vehicle::class);
 
+        $availableTypes = VehicleType::pluck('key')->toArray();
+
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20|unique:vehicles,plate_number',
             'color' => 'required|string|max:30',
-            'type' => 'required|string|in:motorcycle,car',
+            'type' => ['required', 'string', Rule::in($availableTypes)],
         ]);
 
         Vehicle::create($validated);
@@ -65,7 +70,8 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle): View
     {
-        return view('attendant.vehicles.edit', compact('vehicle'));
+        $vehicleTypes = VehicleType::orderBy('name')->get();
+        return view('attendant.vehicles.edit', compact('vehicle', 'vehicleTypes'));
     }
 
     /**
@@ -73,10 +79,12 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle): RedirectResponse
     {
+        $availableTypes = VehicleType::pluck('key')->toArray();
+
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20|unique:vehicles,plate_number,' . $vehicle->id,
             'color' => 'required|string|max:30',
-            'type' => 'required|string|in:motorcycle,car',
+            'type' => ['required', 'string', Rule::in($availableTypes)],
         ]);
 
         $vehicle->update($validated);

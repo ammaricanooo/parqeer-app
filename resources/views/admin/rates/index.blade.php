@@ -67,7 +67,7 @@
                                         {{ $rate->area->name ?? '-' }}
                                     </td>
                                     <td class="px-4 py-3">
-                                        {{ $rate->vehicle_type === 'car' ? 'Mobil' : 'Motor' }}
+                                        {{ $rate->vehicleType->name ?? ucfirst($rate->vehicle_type) }}
                                     </td>
                                     <td class="px-4 py-3">
                                         Rp {{ number_format($rate->amount, 0, ',', '.') }}
