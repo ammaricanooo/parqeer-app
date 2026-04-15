@@ -1,0 +1,50 @@
+DEPLOY PROJECT LARAVEL
+
+AKSES VPS
+root@64.235.61.142 -p 4952
+pw: Kanata
+
+CLONE PROJEK DARI GITHUB
+git clone https://github.com/ammaricanooo/parqeer-app.git
+cd parqeer-app
+
+KONFIGURASI
+SETUP ENVIRONMENT VARIABLES
+cp .env.example .env
+nano .env
+# APP_URL=https://parqeer.ammaricano.my.id
+# DB_DATABASE,
+# DB_USERNAME=parqeer-app
+# DB_PASSWORD=parqeer-ammar
+# GOOGLE_SHEETS_SPREADSHEET_ID=1eQfqbE8D1ZIGDwMIbp71ZKzFfGFllTuLKI1FQPXOuzA
+
+SETUP GOOGLE CREDENTIALS
+cd storage/app
+nano google-credentials.json
+
+INSTALASI DAN MIGRASI
+composer install --no-dev --optimize-autoloader
+php artisan key:generate
+php artisan migrate --force
+# Jika ada seeder: php artisan db:seed --force
+
+OPTIMASI DAN BUILD ASET
+# Jika menggunakan Vite
+npm install && npm run build
+
+# Optimasi Laravel
+php artisan optimize
+
+RESET IZIN FOLDER
+# Pastikan Nginx bisa 'lewat' folder root
+chmod +x /root
+
+# Atur kepemilikan folder projek ke www-data
+chown -R www-data:www-data /root/parqeer-app
+
+# Atur izin tulis untuk storage dan cache
+chmod -R 775 storage bootstrap/cache
+
+CEK CLOUDFLARED
+systemctl restart php8.2-fpm
+systemctl restart cloudflared
